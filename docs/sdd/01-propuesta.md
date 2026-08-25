@@ -52,6 +52,6 @@ Extender LogiTrack API para construir una torre de control de inventario que:
 ## Nota de corrección de requerimientos
 
 El documento de requerimientos original menciona MySQL como motor de base
-de datos. Esto fue un error de transcripción aclarado por el profesor: el
-proyecto base (LogiTrack API) usa **PostgreSQL vía Supabase**, y este es el
-motor real que se usará también en LogiTrack IQ.
+de datos. Esto fue un error de transcripción: el proyecto base (LogiTrack API) 
+usa **PostgreSQL vía Supabase**, y este es el motor real que se usará también 
+en LogiTrack IQ.
