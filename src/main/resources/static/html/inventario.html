@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiTrack — Inventario</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-icon">⇄</span>
+                <span>LogiTrack</span>
+            </div>
+            <nav>
+                <a href="/html/dashboard.html" class="nav-link" data-page="dashboard">📊 Dashboard</a>
+                <a href="/html/productos.html" class="nav-link" data-page="productos">📦 Productos</a>
+                <a href="/html/bodegas.html" class="nav-link" data-page="bodegas">🏬 Bodegas</a>
+                <a href="/html/inventario.html" class="nav-link" data-page="inventario">📋 Inventario</a>
+                <a href="/html/movimientos.html" class="nav-link" data-page="movimientos">🔄 Movimientos</a>
+                <a href="/html/usuarios.html" class="nav-link solo-admin" data-page="usuarios">👥 Usuarios</a>
+                <a href="/html/auditorias.html" class="nav-link solo-admin" data-page="auditorias">🕵️ Auditorías</a>
+                <a href="/html/reportes.html" class="nav-link" data-page="reportes">📈 Reportes</a>
+            </nav>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <h1 class="topbar-title">Inventario</h1>
+                <div class="topbar-actions">
+                    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Cambiar tema">🌙</button>
+                    <div class="user-badge">
+                        <span id="userBadge"></span>
+                        <span id="roleBadge" class="role-badge"></span>
+                    </div>
+                    <button id="logoutButton" class="btn btn-secondary btn-sm" type="button">Cerrar sesión</button>
+                </div>
+            </header>
+
+            <main class="page-content">
+                <div id="inventarioAlert" class="alert alert-error"></div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Stock por bodega</span>
+                    </div>
+
+                    <div class="filter-bar">
+                        <div class="form-group">
+                            <label for="filtroStockBajo">Mostrar solo stock menor a</label>
+                            <input type="number" id="filtroStockBajo" min="1" value="10">
+                        </div>
+                        <button id="btnAplicarFiltro" class="btn btn-secondary btn-sm" type="button" style="width: auto;">
+                            Filtrar stock bajo
+                        </button>
+                        <button id="btnLimpiarFiltro" class="btn btn-secondary btn-sm" type="button" style="width: auto;">
+                            Ver todo
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Bodega</th>
+                                    <th>Producto</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaInventario">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/inventario.js"></script>
+</body>
+</html>

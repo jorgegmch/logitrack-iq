@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiTrack — Movimientos</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-icon">⇄</span>
+                <span>LogiTrack</span>
+            </div>
+            <nav>
+                <a href="/html/dashboard.html" class="nav-link" data-page="dashboard">📊 Dashboard</a>
+                <a href="/html/productos.html" class="nav-link" data-page="productos">📦 Productos</a>
+                <a href="/html/bodegas.html" class="nav-link" data-page="bodegas">🏬 Bodegas</a>
+                <a href="/html/inventario.html" class="nav-link" data-page="inventario">📋 Inventario</a>
+                <a href="/html/movimientos.html" class="nav-link" data-page="movimientos">🔄 Movimientos</a>
+                <a href="/html/usuarios.html" class="nav-link solo-admin" data-page="usuarios">👥 Usuarios</a>
+                <a href="/html/auditorias.html" class="nav-link solo-admin" data-page="auditorias">🕵️ Auditorías</a>
+                <a href="/html/reportes.html" class="nav-link" data-page="reportes">📈 Reportes</a>
+            </nav>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <h1 class="topbar-title">Movimientos</h1>
+                <div class="topbar-actions">
+                    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Cambiar tema">🌙</button>
+                    <div class="user-badge">
+                        <span id="userBadge"></span>
+                        <span id="roleBadge" class="role-badge"></span>
+                    </div>
+                    <button id="logoutButton" class="btn btn-secondary btn-sm" type="button">Cerrar sesión</button>
+                </div>
+            </header>
+
+            <main class="page-content">
+                <div id="movimientosAlert" class="alert alert-error"></div>
+                <div id="movimientosAlertSuccess" class="alert alert-success"></div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Historial de movimientos</span>
+                        <button id="btnNuevoMovimiento" class="btn btn-primary btn-sm" type="button" style="width: auto;">
+                            + Registrar movimiento
+                        </button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <div class="form-group">
+                            <label for="filtroDesde">Desde</label>
+                            <input type="datetime-local" id="filtroDesde">
+                        </div>
+                        <div class="form-group">
+                            <label for="filtroHasta">Hasta</label>
+                            <input type="datetime-local" id="filtroHasta">
+                        </div>
+                        <button id="btnAplicarFiltroFecha" class="btn btn-secondary btn-sm" type="button" style="width: auto;">
+                            Filtrar por rango
+                        </button>
+                        <button id="btnLimpiarFiltroFecha" class="btn btn-secondary btn-sm" type="button" style="width: auto;">
+                            Ver todos
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Usuario</th>
+                                    <th>Origen</th>
+                                    <th>Destino</th>
+                                    <th>Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaMovimientos">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: registrar movimiento -->
+    <div id="modalMovimiento" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Registrar movimiento</span>
+                <button class="modal-close" id="btnCerrarModalMovimiento" type="button">&times;</button>
+            </div>
+
+            <div id="modalMovimientoAlert" class="alert alert-error"></div>
+
+            <form id="formMovimiento">
+                <div class="form-group">
+                    <label for="movimientoTipo">Tipo de movimiento</label>
+                    <select id="movimientoTipo" required>
+                        <option value="ENTRADA">ENTRADA</option>
+                        <option value="SALIDA">SALIDA</option>
+                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="grupoBodegaOrigen" style="display: none;">
+                    <label for="movimientoBodegaOrigen">Bodega origen</label>
+                    <select id="movimientoBodegaOrigen"></select>
+                </div>
+
+                <div class="form-group" id="grupoBodegaDestino">
+                    <label for="movimientoBodegaDestino">Bodega destino</label>
+                    <select id="movimientoBodegaDestino"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Productos</label>
+                    <div id="listaProductosMovimiento"></div>
+                    <button type="button" id="btnAgregarProducto" class="btn btn-secondary btn-sm" style="width: auto; margin-top: 8px;">
+                        + Agregar producto
+                    </button>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="btnCancelarModalMovimiento" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="btnGuardarMovimiento" class="btn btn-primary" style="width: auto;">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/movimientos.js"></script>
+</body>
+</html>

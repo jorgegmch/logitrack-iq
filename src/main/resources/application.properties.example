@@ -1,0 +1,17 @@
+spring.application.name=logitrack
+
+# Configuracion de la base de datos
+spring.datasource.url=jdbc:postgresql://HOST.pooler.supabase.com:6543/DATABASE?prepareThreshold=0
+spring.datasource.username=postgres.PROJECT_REF
+spring.datasource.password=YOUR_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# Hibernate / JPA
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.default_schema=db_logitrack
+
+# JWT
+jwt.secret=YOUR_BASE64_SECRET_KEY_MIN_256_BITS
+jwt.expiration=86400000

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiTrack — Productos</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-icon">⇄</span>
+                <span>LogiTrack</span>
+            </div>
+            <nav>
+                <a href="/html/dashboard.html" class="nav-link" data-page="dashboard">📊 Dashboard</a>
+                <a href="/html/productos.html" class="nav-link" data-page="productos">📦 Productos</a>
+                <a href="/html/bodegas.html" class="nav-link" data-page="bodegas">🏬 Bodegas</a>
+                <a href="/html/inventario.html" class="nav-link" data-page="inventario">📋 Inventario</a>
+                <a href="/html/movimientos.html" class="nav-link" data-page="movimientos">🔄 Movimientos</a>
+                <a href="/html/usuarios.html" class="nav-link solo-admin" data-page="usuarios">👥 Usuarios</a>
+                <a href="/html/auditorias.html" class="nav-link solo-admin" data-page="auditorias">🕵️ Auditorías</a>
+                <a href="/html/reportes.html" class="nav-link" data-page="reportes">📈 Reportes</a>
+            </nav>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <h1 class="topbar-title">Productos</h1>
+                <div class="topbar-actions">
+                    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Cambiar tema">🌙</button>
+                    <div class="user-badge">
+                        <span id="userBadge"></span>
+                        <span id="roleBadge" class="role-badge"></span>
+                    </div>
+                    <button id="logoutButton" class="btn btn-secondary btn-sm" type="button">Cerrar sesión</button>
+                </div>
+            </header>
+
+            <main class="page-content">
+                <div id="productosAlert" class="alert alert-error"></div>
+                <div id="productosAlertSuccess" class="alert alert-success"></div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Catálogo de productos</span>
+                        <button id="btnNuevoProducto" class="btn btn-primary btn-sm" type="button" style="width: auto;">
+                            + Nuevo producto
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProductos">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: crear/editar producto -->
+    <div id="modalProducto" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="modalProductoTitulo">Nuevo producto</span>
+                <button class="modal-close" id="btnCerrarModalProducto" type="button">&times;</button>
+            </div>
+
+            <div id="modalProductoAlert" class="alert alert-error"></div>
+
+            <form id="formProducto">
+                <input type="hidden" id="productoId">
+
+                <div class="form-group">
+                    <label for="productoNombre">Nombre</label>
+                    <input type="text" id="productoNombre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="productoCategoria">Categoría</label>
+                    <input type="text" id="productoCategoria">
+                </div>
+
+                <div class="form-group">
+                    <label for="productoPrecio">Precio</label>
+                    <input type="number" id="productoPrecio" step="0.01" min="0" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="btnCancelarModalProducto" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="btnGuardarProducto" class="btn btn-primary" style="width: auto;">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/productos.js"></script>
+</body>
+</html>
