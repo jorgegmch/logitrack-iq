@@ -31,6 +31,7 @@ Cada regla listada aquí debe tener al menos una prueba asociada en
 | R6 | No se permite una `SALIDA` o `TRANSFERENCIA` que deje una bodega con stock negativo → `400`. |
 | R7 | El stock total de un producto es la suma de sus existencias (`InventarioBodega`) en todas las bodegas. |
 | R8 | La capacidad de una bodega debe ser mayor que 0. |
+| R33 | Los endpoints que reporten stock (`GET /productos/{id}/stock`, `GET /productos/riesgo`, `GET /kpis`) deben calcularlo agregando `DetalleMovimiento` en tiempo real — nunca leyendo `InventarioBodega.stock` directamente, incluso si ambos valores coinciden en los datos de prueba actuales. (Ver hallazgo y justificación en `03-diseno.md`, sección 5.) |
 
 ## 3. Modelo de datos nuevo
 
@@ -195,6 +196,12 @@ reemplazo de resumen, transición de orden, recepción. Consultas no
 requieren auditoría.
 
 ## 8. Documento PDF de la orden
+
+**Nota de alcance:** la generación del PDF es una acción bajo demanda, no
+automática. `crear_orden_borrador` (MCP) únicamente crea el registro en
+base de datos; el PDF se genera solo cuando alguien llama explícitamente
+a `POST /ordenes/{id}/pdf` (ver `03-diseno.md`, sección 6, para el
+razonamiento completo basado en el glosario del PDF de requerimientos).
 
 | # | Regla |
 |---|---|
