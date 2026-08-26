@@ -13,6 +13,8 @@ import com.jorgegmch.logitrack.entity.enums.TipoMovimiento;
 public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
     List<Movimiento> findByFechaBetween(LocalDateTime desde, LocalDateTime hasta);
 
+    long countByTipoAndFechaBetween(TipoMovimiento tipo, LocalDateTime desde, LocalDateTime hasta);
+
     @Query("SELECT DISTINCT m FROM Movimiento m "
             + "LEFT JOIN m.detalles d "
             + "WHERE (:bodegaId IS NULL OR m.bodegaOrigenId.idBodega = :bodegaId OR m.bodegaDestinoId.idBodega = :bodegaId) "
