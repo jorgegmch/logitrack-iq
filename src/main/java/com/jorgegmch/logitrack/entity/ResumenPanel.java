@@ -1,6 +1,6 @@
 package com.jorgegmch.logitrack.entity;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import com.jorgegmch.logitrack.listener.AuditoriaListener;
 
@@ -20,25 +20,23 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditoriaListener.class)
-@Table(name = "producto")
+@Table(name = "resumen_panel")
 @Data
-@EqualsAndHashCode(of = "idProducto")
+@EqualsAndHashCode(of = "idResumenPanel")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Producto {
+public class ResumenPanel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idProducto;
+    private Long idResumenPanel;
 
-    @Column(nullable = false)
-    private String nombre;
+    @Column(nullable = false, unique = true)
+    private LocalDate fecha;
 
-    private String categoria;
-
-    @Column(nullable = false)
-    private BigDecimal precio;
+    @Column(name = "contenido_json", nullable = false, columnDefinition = "TEXT")
+    private String contenidoJson;
 
     @ManyToOne
-    @JoinColumn(name = "proveedor_principal_id")
-    private Proveedor proveedorPrincipalId;
+    @JoinColumn(name = "autor_id", nullable = false)
+    private Usuario autorId;
 }

@@ -1,17 +1,10 @@
 package com.jorgegmch.logitrack.entity;
 
-import java.math.BigDecimal;
-
-import com.jorgegmch.logitrack.listener.AuditoriaListener;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,26 +12,22 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@EntityListeners(AuditoriaListener.class)
-@Table(name = "producto")
+@Table(name = "proveedor")
 @Data
-@EqualsAndHashCode(of = "idProducto")
+@EqualsAndHashCode(of = "idProveedor")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Producto {
+public class Proveedor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idProducto;
+    private Long idProveedor;
 
     @Column(nullable = false)
     private String nombre;
 
-    private String categoria;
-
     @Column(nullable = false)
-    private BigDecimal precio;
+    private String contacto;
 
-    @ManyToOne
-    @JoinColumn(name = "proveedor_principal_id")
-    private Proveedor proveedorPrincipalId;
+    @Column(name = "dias_entrega", nullable = false)
+    private Integer diasEntrega;
 }

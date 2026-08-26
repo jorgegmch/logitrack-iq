@@ -46,7 +46,7 @@ public class ProductoService {
         }
         String categoriaFinal = (categoria != null) ? categoria.trim().toUpperCase() : null;
 
-        return productoRepository.save(new Producto(null, nombre.trim().toUpperCase(), categoriaFinal, precio));
+        return productoRepository.save(new Producto(null, nombre.trim().toUpperCase(), categoriaFinal, precio, null));
     }
 
     @Transactional
