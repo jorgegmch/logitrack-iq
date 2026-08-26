@@ -145,7 +145,6 @@ public class OrdenCompra {
     @JoinColumn(name = "creado_por", nullable = false)
     private Usuario creadoPorId;
 
-    @Lob
     @Column(name = "pdf_generado")
     private byte[] pdfGenerado;
 
@@ -173,8 +172,15 @@ public enum EstadoOrden {
 - `total` se calcula en el servicio (`cantidad × precioUnitario`) y se
   persiste — no se recalcula en cada lectura, para que el histórico de
   una orden no cambie si el precio del producto cambia después.
-- `pdfGenerado` como `byte[]` con `@Lob` (columna `bytea` en PostgreSQL),
-  sin almacenamiento externo de archivos.
+- `pdfGenerado` como `byte[]` **sin** `@Lob` (columna `bytea` en
+  PostgreSQL, no `oid`). Decisión deliberada: `@Lob` sobre `byte[]` hace
+  que Hibernate espere el tipo `oid` (large object), que requiere manejo
+  de sesión persistente durante la transacción — incompatible con el
+  **pooler de transacciones de Supabase** (puerto `6543`) que recicla
+  conexiones entre transacciones. `bytea` sin `@Lob` almacena los bytes
+  directamente en la fila, sin ese requisito, y es 100% compatible con el
+  pooler ya configurado (`prepareThreshold=0`). Sin almacenamiento externo
+  de archivos.
 - No existe un setter público de `estado` sin validación en el flujo de
   negocio: la transición se hace a través de
   `OrdenCompraService.cambiarEstado()`, que aplica la tabla de
