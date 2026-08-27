@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jorgegmch.logitrack.dto.ProductoRequest;
+import com.jorgegmch.logitrack.dto.ProductoStockResponse;
 import com.jorgegmch.logitrack.entity.Producto;
 import com.jorgegmch.logitrack.service.ProductoService;
+import com.jorgegmch.logitrack.service.StockCalculadoService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,9 +29,11 @@ import jakarta.validation.Valid;
 @Tag(name = "Productos", description = "Gestión del catálogo de productos")
 public class ProductoController {
     private final ProductoService productoService;
+    private final StockCalculadoService stockCalculadoService;
 
-    public ProductoController(ProductoService productoService) {
+    public ProductoController(ProductoService productoService, StockCalculadoService stockCalculadoService) {
         this.productoService = productoService;
+        this.stockCalculadoService = stockCalculadoService;
     }
 
     @Operation(summary = "Listar todos los productos")
@@ -44,6 +48,16 @@ public class ProductoController {
     @GetMapping("/{id}")
     public Producto buscarPorId(@PathVariable("id") Long id) {
         return productoService.buscarProductoPorId(id);
+    }
+
+    @Operation(summary = "Obtener el stock total de un producto, calculado desde los movimientos (R33)")
+    @ApiResponse(responseCode = "200", description = "Stock calculado exitosamente")
+    @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    @GetMapping("/{id}/stock")
+    public ProductoStockResponse obtenerStock(@PathVariable("id") Long id) {
+        productoService.buscarProductoPorId(id);
+        Long stockTotal = stockCalculadoService.calcularStockTotalProducto(id);
+        return new ProductoStockResponse(id, stockTotal);
     }
 
     @Operation(summary = "Crear un nuevo producto")
