@@ -65,6 +65,18 @@ public class SecurityConfig {
                         .requestMatchers("/usuarios/**").hasRole("ADMIN")
                         .requestMatchers("/auditorias/**").hasRole("ADMIN")
 
+                        // Corrección: AGENTE no debe poder registrar movimientos
+                        // manualmente (tabla de permisos, sección 7 de la
+                        // especificación). Se agrega ANTES del catch-all
+                        // genérico de /movimientos/**.
+                        .requestMatchers(HttpMethod.POST, "/movimientos/**").hasAnyRole("ADMIN", "EMPLEADO")
+
+                        // Reglas nuevas de LogiTrack IQ (03-diseno.md, sección 7)
+                        .requestMatchers(HttpMethod.POST, "/ordenes").hasAnyRole("ADMIN", "AGENTE")
+                        .requestMatchers(HttpMethod.PATCH, "/ordenes/*/estado").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/ordenes/*/pdf").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/panel/resumen").hasAnyRole("ADMIN", "AGENTE")
+
                         .requestMatchers("/bodegas/**", "/productos/**", "/movimientos/**",
                                 "/inventario/**", "/reportes/**", "/api/reportes/**").authenticated()
                         .anyRequest().authenticated())

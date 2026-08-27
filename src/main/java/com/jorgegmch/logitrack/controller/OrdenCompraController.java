@@ -2,12 +2,15 @@ package com.jorgegmch.logitrack.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jorgegmch.logitrack.dto.CambiarEstadoRequest;
 import com.jorgegmch.logitrack.dto.OrdenCompraRequest;
 import com.jorgegmch.logitrack.entity.OrdenCompra;
 import com.jorgegmch.logitrack.entity.Usuario;
@@ -41,6 +44,17 @@ public class OrdenCompraController {
         return ordenCompraService.crearOrden(request.getProductoId(), request.getProveedorId(),
                 request.getBodegaDestinoId(), request.getCantidad(), request.getPrecioUnitario(),
                 usuarioAutenticadoId);
+    }
+
+    @Operation(summary = "Cambiar el estado de una orden (aprobar, recibir o cancelar). Solo ADMIN.")
+    @ApiResponse(responseCode = "200", description = "Estado actualizado exitosamente")
+    @ApiResponse(responseCode = "400", description = "Transición de estado no permitida")
+    @ApiResponse(responseCode = "403", description = "Rol sin permisos para esta acción")
+    @PatchMapping("/{id}/estado")
+    public OrdenCompra cambiarEstado(@PathVariable("id") Long id, @Valid @RequestBody CambiarEstadoRequest request) {
+        Long usuarioAutenticadoId = obtenerIdUsuarioAutenticado();
+
+        return ordenCompraService.cambiarEstado(id, request.getEstado(), usuarioAutenticadoId);
     }
 
     private Long obtenerIdUsuarioAutenticado() {
