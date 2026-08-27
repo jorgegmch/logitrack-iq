@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -149,6 +150,49 @@ class OrdenCompraControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(cuerpoRequest))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void generarPdf_ordenValida_retorna201ConBytesPdf() throws Exception {
+        byte[] pdfSimulado = "%PDF-1.4 contenido simulado".getBytes();
+
+        when(ordenCompraService.generarPdf(1L)).thenReturn(pdfSimulado);
+
+        mockMvc.perform(post("/ordenes/1/pdf")
+                .with(csrf()))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType("application/pdf"));
+    }
+
+    @Test
+    @WithMockUser(username = "agente_mcp", roles = { "AGENTE" })
+    void generarPdf_agenteSinPermiso_retorna403() throws Exception {
+        mockMvc.perform(post("/ordenes/1/pdf")
+                .with(csrf()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void obtenerPdf_ordenConPdfGenerado_retorna200ConBytesPdf() throws Exception {
+        byte[] pdfSimulado = "%PDF-1.4 contenido simulado".getBytes();
+
+        when(ordenCompraService.obtenerPdf(1L)).thenReturn(pdfSimulado);
+
+        mockMvc.perform(get("/ordenes/1/pdf"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/pdf"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void obtenerPdf_ordenSinPdfGenerado_retorna404() throws Exception {
+        when(ordenCompraService.obtenerPdf(anyLong()))
+                .thenThrow(new RecursoNoEncontradoException("La orden no tiene un PDF generado todavia"));
+
+        mockMvc.perform(get("/ordenes/1/pdf"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

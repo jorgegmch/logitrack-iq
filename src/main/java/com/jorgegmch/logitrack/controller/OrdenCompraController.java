@@ -1,6 +1,7 @@
 package com.jorgegmch.logitrack.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -51,6 +52,23 @@ public class OrdenCompraController {
     @GetMapping("/{id}")
     public OrdenCompra buscarPorId(@PathVariable("id") Long id) {
         return ordenCompraService.buscarOrdenPorId(id);
+    }
+
+    @Operation(summary = "Generar el PDF de la orden (datos completos, marca de agua si esta en BORRADOR). Solo ADMIN.")
+    @ApiResponse(responseCode = "201", description = "PDF generado exitosamente")
+    @ApiResponse(responseCode = "404", description = "Orden no encontrada")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(value = "/{id}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public byte[] generarPdf(@PathVariable("id") Long id) {
+        return ordenCompraService.generarPdf(id);
+    }
+
+    @Operation(summary = "Obtener el PDF ya generado de una orden")
+    @ApiResponse(responseCode = "200", description = "PDF encontrado")
+    @ApiResponse(responseCode = "404", description = "La orden no tiene un PDF generado")
+    @GetMapping(value = "/{id}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public byte[] obtenerPdf(@PathVariable("id") Long id) {
+        return ordenCompraService.obtenerPdf(id);
     }
 
     @Operation(summary = "Crear una orden de compra en estado BORRADOR. El usuario responsable siempre es quien esta autenticado.")

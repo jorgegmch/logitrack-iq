@@ -30,16 +30,18 @@ public class OrdenCompraService {
     private final BodegaRepository bodegaRepository;
     private final UsuarioRepository usuarioRepository;
     private final MovimientoService movimientoService;
+    private final PdfService pdfService;
 
     public OrdenCompraService(OrdenCompraRepository ordenCompraRepository, ProductoRepository productoRepository,
             ProveedorRepository proveedorRepository, BodegaRepository bodegaRepository,
-            UsuarioRepository usuarioRepository, MovimientoService movimientoService) {
+            UsuarioRepository usuarioRepository, MovimientoService movimientoService, PdfService pdfService) {
         this.ordenCompraRepository = ordenCompraRepository;
         this.productoRepository = productoRepository;
         this.proveedorRepository = proveedorRepository;
         this.bodegaRepository = bodegaRepository;
         this.usuarioRepository = usuarioRepository;
         this.movimientoService = movimientoService;
+        this.pdfService = pdfService;
     }
 
     public List<OrdenCompra> listarOrdenes(EstadoOrden estado) {
@@ -131,6 +133,39 @@ public class OrdenCompraService {
         orden.setEstado(nuevoEstado);
 
         return ordenCompraRepository.save(orden);
+    }
+
+    /**
+     * R29/R30: genera el PDF de la orden (datos completos, con marca de
+     * agua diagonal BORRADOR si la orden esta en ese estado) y lo
+     * guarda en la propia orden para reutilizarlo en obtenerPdf.
+     */
+    @Transactional
+    public byte[] generarPdf(Long ordenId) {
+        OrdenCompra orden = buscarOrdenPorId(ordenId);
+
+        byte[] pdfBytes = pdfService.generarPdfOrden(orden);
+
+        orden.setPdfGenerado(pdfBytes);
+        orden.setFechaGeneracionPdf(LocalDateTime.now());
+        ordenCompraRepository.save(orden);
+
+        return pdfBytes;
+    }
+
+    /**
+     * Retorna el PDF ya generado y guardado para la orden. Si nunca se
+     * genero, o si se invalido por un cambio de estado (R20), lanza
+     * RecursoNoEncontradoException.
+     */
+    public byte[] obtenerPdf(Long ordenId) {
+        OrdenCompra orden = buscarOrdenPorId(ordenId);
+
+        if (orden.getPdfGenerado() == null) {
+            throw new RecursoNoEncontradoException("La orden no tiene un PDF generado todavia");
+        }
+
+        return orden.getPdfGenerado();
     }
 
     private void validarTransicion(EstadoOrden actual, EstadoOrden nuevo) {
