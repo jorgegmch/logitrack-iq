@@ -110,10 +110,23 @@ requerimientos.
 ![Verde](/docs/sdd/evidencia/capturas-evidencia-sdd/proveedor-controller-verde.png)
 
 ### 3.4 KpiController
+
 **Rojo:** `cannot find symbol: class KpiController`
 ![Rojo](/docs/sdd/evidencia/capturas-evidencia-sdd/kpi-controller-rojo.png)
 **Verde:** `Tests run: 3, Failures: 0`
 ![Verde](/docs/sdd/evidencia/capturas-evidencia-sdd/kpi-controller-verde.png)
+
+**Nota de refactor posterior:** esta captura refleja el estado original
+de `KpiController`, que incluia `/kpis/riesgo` y `/kpis/bodegas-criticas`
+ademas de `/kpis`. Al detectar que el PDF exige las rutas exactas
+`/productos/riesgo` y `/bodegas/criticas` (ver 3.13, 3.14), esas dos
+rutas se eliminaron de `KpiController` para evitar duplicidad —
+`KpiService` no cambio, solo dejo de ser llamado desde aqui y paso a
+ser llamado desde `ProductoController`/`BodegaController`. El archivo
+de test actual (`KpiControllerTest.java`) solo tiene el test de
+`obtenerKpis`; esta captura se conserva como evidencia historica
+valida del ciclo TDD original, no como reflejo del estado actual del
+archivo.
 
 ### 3.5 GET /productos/{id}/stock (R33)
 **Rojo:** `Status expected:<200> but was:<500>`

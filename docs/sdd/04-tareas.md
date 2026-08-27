@@ -95,6 +95,12 @@ completas y verificadas (compilación y/o ejecución confirmada).
 - [x] Test de integración `GET /bodegas/criticas` (ruta exacta exigida
       por el PDF, distinta de `/kpis/bodegas-criticas` — rojo → verde
       confirmado, mismo tipo de colisión de rutas)
+- [x] **Refactor:** eliminadas las rutas duplicadas `/kpis/riesgo` y
+      `/kpis/bodegas-criticas` de `KpiController` (quedan exclusivamente
+      en `/productos/riesgo` y `/bodegas/criticas`). `KpiService` no
+      cambió — solo dejó de ser consumido desde `KpiController` para
+      esas dos operaciones. `KpiController` ahora solo expone
+      `GET /kpis` (resumen agregado del dashboard)
 
 ## Controladores y seguridad
 
