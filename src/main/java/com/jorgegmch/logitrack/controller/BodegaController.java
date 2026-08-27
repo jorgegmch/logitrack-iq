@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jorgegmch.logitrack.dto.BodegaRequest;
+import com.jorgegmch.logitrack.dto.OcupacionBodegaDTO;
 import com.jorgegmch.logitrack.entity.Bodega;
 import com.jorgegmch.logitrack.service.BodegaService;
+import com.jorgegmch.logitrack.service.KpiService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,15 +29,23 @@ import jakarta.validation.Valid;
 @Tag(name = "Bodegas", description = "Gestión de bodegas")
 public class BodegaController {
     private final BodegaService bodegaService;
+    private final KpiService kpiService;
 
-    public BodegaController(BodegaService bodegaService) {
+    public BodegaController(BodegaService bodegaService, KpiService kpiService) {
         this.bodegaService = bodegaService;
+        this.kpiService = kpiService;
     }
 
     @Operation(summary = "Listar todas las bodegas")
     @GetMapping
     public List<Bodega> listar() {
         return bodegaService.listarBodegas();
+    }
+
+    @Operation(summary = "Listar bodegas con ocupacion critica (>= 90%)")
+    @GetMapping("/criticas")
+    public List<OcupacionBodegaDTO> listarBodegasCriticas() {
+        return kpiService.listarBodegasCriticas();
     }
 
     @Operation(summary = "Buscar una bodega por su id")
