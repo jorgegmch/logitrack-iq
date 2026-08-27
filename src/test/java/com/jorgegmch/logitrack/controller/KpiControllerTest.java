@@ -25,11 +25,17 @@ import com.jorgegmch.logitrack.dto.KpiResponse;
 import com.jorgegmch.logitrack.dto.MovimientosAyerDTO;
 import com.jorgegmch.logitrack.dto.OcupacionBodegaDTO;
 import com.jorgegmch.logitrack.dto.OrdenesPorAprobarDTO;
-import com.jorgegmch.logitrack.dto.ProductoRiesgoDTO;
 import com.jorgegmch.logitrack.security.JwtService;
 import com.jorgegmch.logitrack.service.KpiService;
 import com.jorgegmch.logitrack.service.UsuarioService;
 
+/**
+ * Nota: los tests de listado detallado (riesgo, bodegas criticas) se
+ * movieron a ProductoControllerTest y BodegaControllerTest, ya que
+ * esos endpoints ahora viven exclusivamente ahi (rutas exactas del
+ * PDF: /productos/riesgo, /bodegas/criticas). Este controlador solo
+ * expone el resumen agregado.
+ */
 @WebMvcTest(controllers = KpiController.class,
         excludeAutoConfiguration = UserDetailsServiceAutoConfiguration.class)
 @Import({ SecurityConfig.class, PasswordEncoderConfig.class })
@@ -64,30 +70,5 @@ class KpiControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.productosEnQuiebre").value(2))
                 .andExpect(jsonPath("$.productosEnRiesgo").value(1));
-    }
-
-    @Test
-    @WithMockUser(username = "admin", roles = { "ADMIN" })
-    void listarProductosEnRiesgo_retorna200ConLista() throws Exception {
-        ProductoRiesgoDTO riesgo = new ProductoRiesgoDTO(1L, "Silla ergonomica", 1L, 10L,
-                BigDecimal.valueOf(2.5), BigDecimal.valueOf(20), BigDecimal.valueOf(4), "CON_CONSUMO", 2L);
-
-        when(kpiService.listarProductosEnRiesgo()).thenReturn(List.of(riesgo));
-
-        mockMvc.perform(get("/kpis/riesgo"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nombreProducto").value("Silla ergonomica"));
-    }
-
-    @Test
-    @WithMockUser(username = "admin", roles = { "ADMIN" })
-    void listarBodegasCriticas_retorna200ConLista() throws Exception {
-        OcupacionBodegaDTO critica = new OcupacionBodegaDTO(1L, "Bodega Norte", BigDecimal.valueOf(92));
-
-        when(kpiService.listarBodegasCriticas()).thenReturn(List.of(critica));
-
-        mockMvc.perform(get("/kpis/bodegas-criticas"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nombre").value("Bodega Norte"));
     }
 }
