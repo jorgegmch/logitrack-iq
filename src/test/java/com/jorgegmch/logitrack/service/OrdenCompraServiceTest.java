@@ -144,4 +144,31 @@ class OrdenCompraServiceTest {
 
         assertThat(resultado.getEstado()).isEqualTo(EstadoOrden.RECIBIDA);
     }
+
+    /**
+     * R20 (parte pendiente de T8): al cambiar el estado de una orden,
+     * el PDF previamente generado debe invalidarse (limpiarse), sin
+     * importar cual sea la transicion. Esta regla ya estaba
+     * implementada desde el diseño original de cambiarEstado; este
+     * test la confirma explicitamente por primera vez — no es un
+     * ciclo rojo->verde genuino, es un test de regresion sobre
+     * comportamiento existente (documentado asi en evidencia-sdd.md).
+     */
+    @Test
+    void cambiarEstado_ordenConPdfGenerado_invalidaElPdf() {
+        OrdenCompra ordenBorrador = new OrdenCompra();
+        ordenBorrador.setIdOrdenCompra(1L);
+        ordenBorrador.setEstado(EstadoOrden.BORRADOR);
+        ordenBorrador.setPdfGenerado("%PDF-1.4 contenido previo".getBytes());
+        ordenBorrador.setFechaGeneracionPdf(java.time.LocalDateTime.now().minusHours(1));
+
+        when(ordenCompraRepository.findById(1L)).thenReturn(Optional.of(ordenBorrador));
+        when(ordenCompraRepository.save(any(OrdenCompra.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        OrdenCompra resultado = ordenCompraService.cambiarEstado(1L, EstadoOrden.APROBADA, 1L);
+
+        assertThat(resultado.getPdfGenerado()).isNull();
+        assertThat(resultado.getFechaGeneracionPdf()).isNull();
+        assertThat(resultado.getEstado()).isEqualTo(EstadoOrden.APROBADA);
+    }
 }
