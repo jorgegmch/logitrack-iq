@@ -45,6 +45,7 @@ completas y verificadas (compilación y/o ejecución confirmada).
 ## DTOs
 
 - [x] `OrdenCompraRequest`
+- [x] `CambiarEstadoRequest`
 - [x] `AlertaDTO`, `AccionSugeridaDTO`, `ResumenPanelRequest`
 - [x] `DesgloseStockBodegaDTO`, `ProductoRiesgoDTO`, `OcupacionBodegaDTO`,
       `OrdenesPorAprobarDTO`, `MovimientosAyerDTO`, `KpiResponse`
@@ -53,32 +54,38 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 - [x] Tests unitarios de `OrdenCompraService` (T3, T4, T5)
 - [x] Tests unitarios de `KpiService` (T1, T2 + caso positivo)
-- [ ] Test de integración `POST /ordenes` (en curso — rojo confirmado,
-      pendiente verde)
-- [ ] Test T6: `AGENTE` intenta aprobar orden → 403
+- [x] Test de integración `POST /ordenes` (rojo confirmado → verde
+      confirmado)
+- [x] Test T6: `AGENTE` intenta aprobar orden → 403 (rojo confirmado →
+      verde confirmado, con `AccessDeniedHandlerImpl` respondiendo 403
+      real por rol)
+- [x] Prueba de integración adicional: `PATCH /ordenes/{id}/estado`
+      (ADMIN aprueba correctamente, rojo → verde confirmado)
 - [ ] Test T7: resumen con severidad/ID inválido → 400, se conserva el
       anterior
 - [ ] Test T8: PDF de orden en BORRADOR con marca de agua, invalidación al
       cambiar estado
-- [ ] Al menos una prueba de integración adicional (`PATCH
-      /ordenes/{id}/estado` o `POST /panel/resumen`)
 
 ## Controladores y seguridad
 
-- [ ] `OrdenCompraController` completo (crear, listar, buscar, cambiar
-      estado, PDF)
+- [x] `OrdenCompraController`: `crear` (`POST /ordenes`)
+- [x] `OrdenCompraController`: `cambiarEstado` (`PATCH /ordenes/{id}/estado`)
+- [ ] `OrdenCompraController`: `listar`, `buscarPorId`
+- [ ] `OrdenCompraController`: generar/obtener PDF
 - [ ] `ProveedorController`
 - [ ] `ResumenPanelController`
 - [ ] `KpiController` (+ endpoints de riesgo y bodegas críticas)
 - [ ] Endpoint `GET /productos/{id}/stock`
-- [ ] Actualizar `SecurityConfig` con las reglas de la sección 7 de
-      `03-diseno.md`
+- [x] Actualizar `SecurityConfig` con las reglas de la sección 7 de
+      `03-diseno.md` (POST /ordenes, PATCH /ordenes/*/estado, POST
+      /ordenes/*/pdf, POST /panel/resumen, correccion de POST
+      /movimientos excluyendo AGENTE)
 - [ ] Documentar endpoints nuevos en Swagger/OpenAPI
 
 ## Documento PDF de la orden
 
-- [ ] Confirmar librería (OpenPDF por defecto)
-- [ ] Generación con datos completos (R29)
+- [ ] Confirmar libreria (OpenPDF por defecto)
+- [ ] Generacion con datos completos (R29)
 - [ ] Marca de agua diagonal BORRADOR (R30)
 - [ ] Endpoints `POST`/`GET /ordenes/{id}/pdf`
 
@@ -93,12 +100,12 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 - [ ] `skills/operacion-logitrack/SKILL.md`
 - [ ] Flujo `Resumen diario de inventario` (JSON)
-- [ ] Export del flujo + capturas de ejecución exitosa y error controlado
+- [ ] Export del flujo + capturas de ejecucion exitosa y error controlado
 
 ## Dashboard
 
 - [ ] `frontend/` conectado a la API real
-- [ ] KPIs, riesgo, órdenes BORRADOR, PDF, botón Aprobar solo ADMIN
+- [ ] KPIs, riesgo, ordenes BORRADOR, PDF, boton Aprobar solo ADMIN
 
 ## Docker
 
@@ -108,8 +115,8 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 ## Cierre SDD y entrega
 
-- [ ] `docs/sdd/evidencia-sdd.md` (hashes, tabla regla→prueba, evidencia
-      roja/verde, reflexión)
+- [ ] `docs/sdd/evidencia-sdd.md` (hashes, tabla regla-prueba, evidencia
+      roja/verde, reflexion) - en construccion, ver borrador actual
 - [ ] README definitivo
-- [ ] Diagrama n8n → MCP → API → BD → dashboard
+- [ ] Diagrama n8n -> MCP -> API -> BD -> dashboard
 - [ ] Video 4-6 min
