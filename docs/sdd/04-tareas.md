@@ -46,6 +46,7 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 - [x] `OrdenCompraRequest`
 - [x] `CambiarEstadoRequest`
+- [x] `ProductoStockResponse`
 - [x] `AlertaDTO`, `AccionSugeridaDTO`, `ResumenPanelRequest`
 - [x] `DesgloseStockBodegaDTO`, `ProductoRiesgoDTO`, `OcupacionBodegaDTO`,
       `OrdenesPorAprobarDTO`, `MovimientosAyerDTO`, `KpiResponse`
@@ -61,6 +62,14 @@ completas y verificadas (compilación y/o ejecución confirmada).
       real por rol)
 - [x] Prueba de integración adicional: `PATCH /ordenes/{id}/estado`
       (ADMIN aprueba correctamente, rojo → verde confirmado)
+- [x] Test de integración `ProveedorController` (listar, buscarPorId
+      encontrado/no encontrado — rojo → verde confirmado)
+- [x] Test de integración `KpiController` (resumen, riesgo, bodegas
+      críticas — rojo → verde confirmado)
+- [x] Test de integración `GET /productos/{id}/stock` (encontrado/no
+      encontrado — rojo → verde confirmado)
+- [x] Test de integración `OrdenCompraController`: `listar`,
+      `buscarPorId` (rojo → verde confirmado)
 - [ ] Test T7: resumen con severidad/ID inválido → 400, se conserva el
       anterior
 - [ ] Test T8: PDF de orden en BORRADOR con marca de agua, invalidación al
@@ -70,12 +79,12 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 - [x] `OrdenCompraController`: `crear` (`POST /ordenes`)
 - [x] `OrdenCompraController`: `cambiarEstado` (`PATCH /ordenes/{id}/estado`)
-- [ ] `OrdenCompraController`: `listar`, `buscarPorId`
+- [x] `OrdenCompraController`: `listar`, `buscarPorId`
 - [ ] `OrdenCompraController`: generar/obtener PDF
-- [ ] `ProveedorController`
+- [x] `ProveedorController` (listar, buscarPorId)
 - [ ] `ResumenPanelController`
-- [ ] `KpiController` (+ endpoints de riesgo y bodegas críticas)
-- [ ] Endpoint `GET /productos/{id}/stock`
+- [x] `KpiController` (resumen + endpoints de riesgo y bodegas críticas)
+- [x] Endpoint `GET /productos/{id}/stock`
 - [x] Actualizar `SecurityConfig` con las reglas de la sección 7 de
       `03-diseno.md` (POST /ordenes, PATCH /ordenes/*/estado, POST
       /ordenes/*/pdf, POST /panel/resumen, correccion de POST
