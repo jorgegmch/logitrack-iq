@@ -36,11 +36,14 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 - [x] `ProveedorService`
 - [x] `OrdenCompraService` (máquina de estados R17-R19, recepción
-      transaccional R18, invalidación de PDF R20)
+      transaccional R18, invalidación de PDF R20, generación/obtención
+      de PDF vía `PdfService`)
 - [x] `ResumenPanelService` (validación completa del contrato R21-R26,
       reemplazo por fecha R11)
 - [x] `StockCalculadoService` (reutilizable, R1/R33)
 - [x] `KpiService` (4 indicadores, productos en riesgo, bodegas críticas)
+- [x] `PdfService` (R29: datos completos, R30: marca de agua diagonal
+      condicional — OpenPDF 1.3.32, paquete `com.lowagie.text`)
 
 ## DTOs
 
@@ -53,8 +56,15 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 ## Pruebas (TDD)
 
-- [x] Tests unitarios de `OrdenCompraService` (T3, T4, T5)
-- [x] Tests unitarios de `KpiService` (T1, T2 + caso positivo)
+- [ ] **CORRECCIÓN:** Tests unitarios de `OrdenCompraService` (T3, T4,
+      T5) — **archivo `OrdenCompraServiceTest.java` NO existe en el
+      proyecto** (confirmado revisando el explorador de archivos
+      completo). Estaba marcado `[x]` por error; nunca se copió al
+      proyecto tras haberse redactado en una sesión anterior. **Pendiente
+      recrear.**
+- [ ] **CORRECCIÓN:** Tests unitarios de `KpiService` (T1, T2 + caso
+      positivo) — **archivo `KpiServiceTest.java` NO existe en el
+      proyecto**, mismo motivo que el anterior. **Pendiente recrear.**
 - [x] Test de integración `POST /ordenes` (rojo confirmado → verde
       confirmado)
 - [x] Test T6: `AGENTE` intenta aprobar orden → 403 (rojo confirmado →
@@ -70,33 +80,47 @@ completas y verificadas (compilación y/o ejecución confirmada).
       encontrado — rojo → verde confirmado)
 - [x] Test de integración `OrdenCompraController`: `listar`,
       `buscarPorId` (rojo → verde confirmado)
-- [ ] Test T7: resumen con severidad/ID inválido → 400, se conserva el
-      anterior
-- [ ] Test T8: PDF de orden en BORRADOR con marca de agua, invalidación al
-      cambiar estado
+- [x] Test de integración `ResumenPanelController` (GET, POST válido —
+      rojo → verde confirmado)
+- [x] Test T7: resumen con severidad/ID inválido → 400 (2 tests: severidad
+      inválida y producto inexistente — rojo → verde confirmado)
+- [x] Test unitario `PdfService`: marca de agua condicional según
+      estado (BORRADOR sí / APROBADA no) + datos completos de la orden
+      (R29, R30 — rojo → verde confirmado, verificado extrayendo texto
+      real del PDF con `PdfTextExtractor`)
+- [x] Test de integración `OrdenCompraController`: `generarPdf`,
+      `obtenerPdf` (incluye caso AGENTE sin permiso → 403 — rojo → verde
+      confirmado)
+- [ ] Test T8 (parte pendiente): invalidación específica del PDF al
+      cambiar estado (R20) — la regla ya está implementada en
+      `OrdenCompraService.cambiarEstado`, pero falta un test dedicado
+      que lo confirme explícitamente (actualmente solo se prueba de
+      forma indirecta)
 
 ## Controladores y seguridad
 
 - [x] `OrdenCompraController`: `crear` (`POST /ordenes`)
 - [x] `OrdenCompraController`: `cambiarEstado` (`PATCH /ordenes/{id}/estado`)
 - [x] `OrdenCompraController`: `listar`, `buscarPorId`
-- [ ] `OrdenCompraController`: generar/obtener PDF
+- [x] `OrdenCompraController`: `generarPdf`, `obtenerPdf`
 - [x] `ProveedorController` (listar, buscarPorId)
-- [ ] `ResumenPanelController`
+- [x] `ResumenPanelController` (GET, POST)
 - [x] `KpiController` (resumen + endpoints de riesgo y bodegas críticas)
 - [x] Endpoint `GET /productos/{id}/stock`
 - [x] Actualizar `SecurityConfig` con las reglas de la sección 7 de
       `03-diseno.md` (POST /ordenes, PATCH /ordenes/*/estado, POST
-      /ordenes/*/pdf, POST /panel/resumen, correccion de POST
+      /ordenes/*/pdf, POST /panel/resumen, corrección de POST
       /movimientos excluyendo AGENTE)
 - [ ] Documentar endpoints nuevos en Swagger/OpenAPI
 
 ## Documento PDF de la orden
 
-- [ ] Confirmar libreria (OpenPDF por defecto)
-- [ ] Generacion con datos completos (R29)
-- [ ] Marca de agua diagonal BORRADOR (R30)
-- [ ] Endpoints `POST`/`GET /ordenes/{id}/pdf`
+- [x] Confirmar librería (OpenPDF 1.3.32, paquete clásico
+      `com.lowagie.text` — se evitó deliberadamente la 2.x/3.x, que
+      renombra todo a `org.openpdf`)
+- [x] Generación con datos completos (R29)
+- [x] Marca de agua diagonal BORRADOR (R30)
+- [x] Endpoints `POST`/`GET /ordenes/{id}/pdf`
 
 ## Servidor MCP
 
@@ -109,12 +133,12 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 - [ ] `skills/operacion-logitrack/SKILL.md`
 - [ ] Flujo `Resumen diario de inventario` (JSON)
-- [ ] Export del flujo + capturas de ejecucion exitosa y error controlado
+- [ ] Export del flujo + capturas de ejecución exitosa y error controlado
 
 ## Dashboard
 
 - [ ] `frontend/` conectado a la API real
-- [ ] KPIs, riesgo, ordenes BORRADOR, PDF, boton Aprobar solo ADMIN
+- [ ] KPIs, riesgo, órdenes BORRADOR, PDF, botón Aprobar solo ADMIN
 
 ## Docker
 
@@ -124,8 +148,15 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 ## Cierre SDD y entrega
 
-- [ ] `docs/sdd/evidencia-sdd.md` (hashes, tabla regla-prueba, evidencia
-      roja/verde, reflexion) - en construccion, ver borrador actual
+- [ ] `docs/sdd/evidencia-sdd.md` (hashes, tabla regla→prueba, evidencia
+      roja/verde, reflexión) — en construcción, ver documento actual
 - [ ] README definitivo
-- [ ] Diagrama n8n -> MCP -> API -> BD -> dashboard
+- [ ] Diagrama n8n → MCP → API → BD → dashboard
 - [ ] Video 4-6 min
+
+## Pendientes técnicos detectados en esta revisión
+
+- [ ] Recrear `OrdenCompraServiceTest.java` (T3, T4, T5)
+- [ ] Recrear `KpiServiceTest.java` (T1, T2 + caso positivo)
+- [ ] Test dedicado para invalidación de PDF al cambiar estado (R20,
+      parte de T8)
