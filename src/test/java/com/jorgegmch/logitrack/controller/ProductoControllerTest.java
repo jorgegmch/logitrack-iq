@@ -17,18 +17,25 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.jorgegmch.logitrack.config.PasswordEncoderConfig;
 import com.jorgegmch.logitrack.config.SecurityConfig;
+import com.jorgegmch.logitrack.dto.ProductoRiesgoDTO;
 import com.jorgegmch.logitrack.entity.Producto;
 import com.jorgegmch.logitrack.exception.RecursoNoEncontradoException;
 import com.jorgegmch.logitrack.security.JwtService;
+import com.jorgegmch.logitrack.service.KpiService;
 import com.jorgegmch.logitrack.service.ProductoService;
 import com.jorgegmch.logitrack.service.StockCalculadoService;
 import com.jorgegmch.logitrack.service.UsuarioService;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 /**
- * Test de integración (slice web) enfocado únicamente en el endpoint
- * nuevo GET /productos/{id}/stock. ProductoController ya existía sin
- * tests para sus otros métodos (listar, crear, actualizar, eliminar);
- * esos quedan fuera del alcance de este ciclo TDD puntual.
+ * Test de integración (slice web) de ProductoController: cubre
+ * GET /productos/{id}/stock y GET /productos/riesgo (esta última
+ * ruta exigida textualmente por el PDF de requerimientos, distinta
+ * de /kpis/riesgo que se habia usado antes). Los demas metodos
+ * (listar, crear, actualizar, eliminar) quedan fuera del alcance de
+ * este ciclo TDD puntual.
  */
 @WebMvcTest(controllers = ProductoController.class,
         excludeAutoConfiguration = UserDetailsServiceAutoConfiguration.class)
@@ -43,6 +50,9 @@ class ProductoControllerTest {
 
     @MockitoBean
     private StockCalculadoService stockCalculadoService;
+
+    @MockitoBean
+    private KpiService kpiService;
 
     @MockitoBean
     private UsuarioService usuarioService;
@@ -74,5 +84,18 @@ class ProductoControllerTest {
 
         mockMvc.perform(get("/productos/99/stock"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void listarProductosEnRiesgo_retorna200ConLista() throws Exception {
+        ProductoRiesgoDTO riesgo = new ProductoRiesgoDTO(1L, "Silla ergonomica", 1L, 10L,
+                BigDecimal.valueOf(2.5), BigDecimal.valueOf(20), BigDecimal.valueOf(4), "CON_CONSUMO", 2L);
+
+        when(kpiService.listarProductosEnRiesgo()).thenReturn(List.of(riesgo));
+
+        mockMvc.perform(get("/productos/riesgo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nombreProducto").value("Silla ergonomica"));
     }
 }

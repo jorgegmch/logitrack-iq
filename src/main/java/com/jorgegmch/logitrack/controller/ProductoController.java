@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jorgegmch.logitrack.dto.ProductoRequest;
+import com.jorgegmch.logitrack.dto.ProductoRiesgoDTO;
 import com.jorgegmch.logitrack.dto.ProductoStockResponse;
 import com.jorgegmch.logitrack.entity.Producto;
+import com.jorgegmch.logitrack.service.KpiService;
 import com.jorgegmch.logitrack.service.ProductoService;
 import com.jorgegmch.logitrack.service.StockCalculadoService;
 
@@ -30,16 +32,25 @@ import jakarta.validation.Valid;
 public class ProductoController {
     private final ProductoService productoService;
     private final StockCalculadoService stockCalculadoService;
+    private final KpiService kpiService;
 
-    public ProductoController(ProductoService productoService, StockCalculadoService stockCalculadoService) {
+    public ProductoController(ProductoService productoService, StockCalculadoService stockCalculadoService,
+            KpiService kpiService) {
         this.productoService = productoService;
         this.stockCalculadoService = stockCalculadoService;
+        this.kpiService = kpiService;
     }
 
     @Operation(summary = "Listar todos los productos")
     @GetMapping
     public List<Producto> listar() {
         return productoService.listarProductos();
+    }
+
+    @Operation(summary = "Listar productos actualmente en riesgo de quiebre de stock")
+    @GetMapping("/riesgo")
+    public List<ProductoRiesgoDTO> listarProductosEnRiesgo() {
+        return kpiService.listarProductosEnRiesgo();
     }
 
     @Operation(summary = "Buscar un producto por su id")

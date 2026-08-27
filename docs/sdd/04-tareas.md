@@ -56,15 +56,11 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 ## Pruebas (TDD)
 
-- [ ] **CORRECCIÓN:** Tests unitarios de `OrdenCompraService` (T3, T4,
-      T5) — **archivo `OrdenCompraServiceTest.java` NO existe en el
-      proyecto** (confirmado revisando el explorador de archivos
-      completo). Estaba marcado `[x]` por error; nunca se copió al
-      proyecto tras haberse redactado en una sesión anterior. **Pendiente
-      recrear.**
-- [ ] **CORRECCIÓN:** Tests unitarios de `KpiService` (T1, T2 + caso
-      positivo) — **archivo `KpiServiceTest.java` NO existe en el
-      proyecto**, mismo motivo que el anterior. **Pendiente recrear.**
+- [x] Tests unitarios de `OrdenCompraService` (T3, T4, T5) —
+      **recreado** tras confirmar que el archivo original nunca se
+      copió al proyecto (verde directo, 5 tests: T3 x2, T4, T5, R20)
+- [x] Tests unitarios de `KpiService` (T1, T2 + caso positivo) —
+      **recreado**, mismo motivo (verde directo, 3 tests)
 - [x] Test de integración `POST /ordenes` (rojo confirmado → verde
       confirmado)
 - [x] Test T6: `AGENTE` intenta aprobar orden → 403 (rojo confirmado →
@@ -91,11 +87,10 @@ completas y verificadas (compilación y/o ejecución confirmada).
 - [x] Test de integración `OrdenCompraController`: `generarPdf`,
       `obtenerPdf` (incluye caso AGENTE sin permiso → 403 — rojo → verde
       confirmado)
-- [ ] Test T8 (parte pendiente): invalidación específica del PDF al
-      cambiar estado (R20) — la regla ya está implementada en
-      `OrdenCompraService.cambiarEstado`, pero falta un test dedicado
-      que lo confirme explícitamente (actualmente solo se prueba de
-      forma indirecta)
+- [x] Test T8 completo: invalidación específica del PDF al cambiar
+      estado (R20) — test dedicado agregado a `OrdenCompraServiceTest`
+      confirmando que `pdfGenerado`/`fechaGeneracionPdf` quedan `null`
+      tras cualquier transición
 
 ## Controladores y seguridad
 
@@ -111,7 +106,13 @@ completas y verificadas (compilación y/o ejecución confirmada).
       `03-diseno.md` (POST /ordenes, PATCH /ordenes/*/estado, POST
       /ordenes/*/pdf, POST /panel/resumen, corrección de POST
       /movimientos excluyendo AGENTE)
-- [ ] Documentar endpoints nuevos en Swagger/OpenAPI
+- [x] Anotar endpoints nuevos con Swagger/OpenAPI (`@Operation`,
+      `@ApiResponse`, `@Tag` ya presentes en todos los controladores
+      nuevos y en los métodos agregados a controladores existentes)
+- [ ] **Pendiente real:** verificar en vivo en `/swagger-ui/index.html`
+      que la documentación se renderiza correctamente (las anotaciones
+      ya están en el código, pero nunca se confirmó visualmente que
+      Swagger UI las levante sin errores)
 
 ## Documento PDF de la orden
 
@@ -154,9 +155,13 @@ completas y verificadas (compilación y/o ejecución confirmada).
 - [ ] Diagrama n8n → MCP → API → BD → dashboard
 - [ ] Video 4-6 min
 
-## Pendientes técnicos detectados en esta revisión
+## Estado del backend + pruebas (BLOQUE CERRADO)
 
-- [ ] Recrear `OrdenCompraServiceTest.java` (T3, T4, T5)
-- [ ] Recrear `KpiServiceTest.java` (T1, T2 + caso positivo)
-- [ ] Test dedicado para invalidación de PDF al cambiar estado (R20,
-      parte de T8)
+Con la recreación de `OrdenCompraServiceTest.java`, `KpiServiceTest.java`,
+y el test dedicado de R20, **la capa de backend + pruebas queda
+completa y verificada** — todos los tests documentados en este
+checklist existen realmente en el proyecto y compilan/pasan. Solo
+queda pendiente la verificación visual de Swagger UI (tarea trivial,
+no bloqueante) antes de considerar este bloque totalmente cerrado.
+
+Siguiente bloque del proyecto: servidor MCP → dashboard → n8n → Docker.
