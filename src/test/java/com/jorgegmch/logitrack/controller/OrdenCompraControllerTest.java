@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import com.jorgegmch.logitrack.config.SecurityConfig;
 import com.jorgegmch.logitrack.entity.OrdenCompra;
 import com.jorgegmch.logitrack.entity.Usuario;
 import com.jorgegmch.logitrack.entity.enums.EstadoOrden;
+import com.jorgegmch.logitrack.exception.RecursoNoEncontradoException;
 import com.jorgegmch.logitrack.security.JwtService;
 import com.jorgegmch.logitrack.service.OrdenCompraService;
 import com.jorgegmch.logitrack.service.UsuarioService;
@@ -146,5 +149,44 @@ class OrdenCompraControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(cuerpoRequest))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void listar_retornaListaDeOrdenes() throws Exception {
+        OrdenCompra orden = new OrdenCompra();
+        orden.setIdOrdenCompra(1L);
+        orden.setEstado(EstadoOrden.BORRADOR);
+
+        when(ordenCompraService.listarOrdenes(null)).thenReturn(List.of(orden));
+
+        mockMvc.perform(get("/ordenes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].idOrdenCompra").value(1))
+                .andExpect(jsonPath("$[0].estado").value("BORRADOR"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void buscarPorId_ordenExistente_retorna200() throws Exception {
+        OrdenCompra orden = new OrdenCompra();
+        orden.setIdOrdenCompra(1L);
+        orden.setEstado(EstadoOrden.BORRADOR);
+
+        when(ordenCompraService.buscarOrdenPorId(1L)).thenReturn(orden);
+
+        mockMvc.perform(get("/ordenes/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idOrdenCompra").value(1));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void buscarPorId_ordenNoExistente_retorna404() throws Exception {
+        when(ordenCompraService.buscarOrdenPorId(anyLong()))
+                .thenThrow(new RecursoNoEncontradoException("Orden de compra no encontrada con id: 99"));
+
+        mockMvc.perform(get("/ordenes/99"))
+                .andExpect(status().isNotFound());
     }
 }
