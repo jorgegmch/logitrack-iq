@@ -57,10 +57,10 @@ completas y verificadas (compilación y/o ejecución confirmada).
 ## Pruebas (TDD)
 
 - [x] Tests unitarios de `OrdenCompraService` (T3, T4, T5) —
-      **recreado** tras confirmar que el archivo original nunca se
+      recreado tras confirmar que el archivo original nunca se
       copió al proyecto (verde directo, 5 tests: T3 x2, T4, T5, R20)
 - [x] Tests unitarios de `KpiService` (T1, T2 + caso positivo) —
-      **recreado**, mismo motivo (verde directo, 3 tests)
+      recreado, mismo motivo (verde directo, 3 tests)
 - [x] Test de integración `POST /ordenes` (rojo confirmado → verde
       confirmado)
 - [x] Test T6: `AGENTE` intenta aprobar orden → 403 (rojo confirmado →
@@ -70,8 +70,8 @@ completas y verificadas (compilación y/o ejecución confirmada).
       (ADMIN aprueba correctamente, rojo → verde confirmado)
 - [x] Test de integración `ProveedorController` (listar, buscarPorId
       encontrado/no encontrado — rojo → verde confirmado)
-- [x] Test de integración `KpiController` (resumen, riesgo, bodegas
-      críticas — rojo → verde confirmado)
+- [x] Test de integración `KpiController` (resumen — rojo → verde
+      confirmado)
 - [x] Test de integración `GET /productos/{id}/stock` (encontrado/no
       encontrado — rojo → verde confirmado)
 - [x] Test de integración `OrdenCompraController`: `listar`,
@@ -89,8 +89,12 @@ completas y verificadas (compilación y/o ejecución confirmada).
       confirmado)
 - [x] Test T8 completo: invalidación específica del PDF al cambiar
       estado (R20) — test dedicado agregado a `OrdenCompraServiceTest`
-      confirmando que `pdfGenerado`/`fechaGeneracionPdf` quedan `null`
-      tras cualquier transición
+- [x] Test de integración `GET /productos/riesgo` (ruta exacta exigida
+      por el PDF, distinta de `/kpis/riesgo` — rojo → verde confirmado,
+      rojo genuino: colisión de rutas con `/productos/{id}`)
+- [x] Test de integración `GET /bodegas/criticas` (ruta exacta exigida
+      por el PDF, distinta de `/kpis/bodegas-criticas` — rojo → verde
+      confirmado, mismo tipo de colisión de rutas)
 
 ## Controladores y seguridad
 
@@ -100,25 +104,24 @@ completas y verificadas (compilación y/o ejecución confirmada).
 - [x] `OrdenCompraController`: `generarPdf`, `obtenerPdf`
 - [x] `ProveedorController` (listar, buscarPorId)
 - [x] `ResumenPanelController` (GET, POST)
-- [x] `KpiController` (resumen + endpoints de riesgo y bodegas críticas)
+- [x] `KpiController` (resumen)
 - [x] Endpoint `GET /productos/{id}/stock`
+- [x] Endpoint `GET /productos/riesgo` (ruta exacta del PDF)
+- [x] Endpoint `GET /bodegas/criticas` (ruta exacta del PDF)
 - [x] Actualizar `SecurityConfig` con las reglas de la sección 7 de
-      `03-diseno.md` (POST /ordenes, PATCH /ordenes/*/estado, POST
-      /ordenes/*/pdf, POST /panel/resumen, corrección de POST
-      /movimientos excluyendo AGENTE)
-- [x] Anotar endpoints nuevos con Swagger/OpenAPI (`@Operation`,
-      `@ApiResponse`, `@Tag` ya presentes en todos los controladores
-      nuevos y en los métodos agregados a controladores existentes)
-- [ ] **Pendiente real:** verificar en vivo en `/swagger-ui/index.html`
-      que la documentación se renderiza correctamente (las anotaciones
-      ya están en el código, pero nunca se confirmó visualmente que
-      Swagger UI las levante sin errores)
+      `03-diseno.md`
+- [x] Anotar endpoints nuevos con Swagger/OpenAPI
+- [x] Verificar en vivo Swagger UI (`/swagger-ui/index.html`) — **hecho**,
+      capturas confirmando que las 30+ rutas se renderizan correctamente
+      y sin errores, incluidas `/productos/riesgo` y `/bodegas/criticas`
+      ya corregidas
+- [ ] Evidencia de endpoints **protegidos** en Swagger (login real + JWT
+      + intento sin token + intento con rol incorrecto) — pendiente,
+      ver explicación abajo
 
 ## Documento PDF de la orden
 
-- [x] Confirmar librería (OpenPDF 1.3.32, paquete clásico
-      `com.lowagie.text` — se evitó deliberadamente la 2.x/3.x, que
-      renombra todo a `org.openpdf`)
+- [x] Confirmar librería (OpenPDF 1.3.32, paquete clásico `com.lowagie.text`)
 - [x] Generación con datos completos (R29)
 - [x] Marca de agua diagonal BORRADOR (R30)
 - [x] Endpoints `POST`/`GET /ordenes/{id}/pdf`
@@ -149,19 +152,18 @@ completas y verificadas (compilación y/o ejecución confirmada).
 
 ## Cierre SDD y entrega
 
-- [ ] `docs/sdd/evidencia-sdd.md` (hashes, tabla regla→prueba, evidencia
-      roja/verde, reflexión) — en construcción, ver documento actual
+- [ ] `docs/sdd/evidencia-sdd.md` — en construcción
 - [ ] README definitivo
 - [ ] Diagrama n8n → MCP → API → BD → dashboard
 - [ ] Video 4-6 min
 
 ## Estado del backend + pruebas (BLOQUE CERRADO)
 
-Con la recreación de `OrdenCompraServiceTest.java`, `KpiServiceTest.java`,
-y el test dedicado de R20, **la capa de backend + pruebas queda
-completa y verificada** — todos los tests documentados en este
-checklist existen realmente en el proyecto y compilan/pasan. Solo
-queda pendiente la verificación visual de Swagger UI (tarea trivial,
-no bloqueante) antes de considerar este bloque totalmente cerrado.
+La capa de backend + pruebas queda completa y verificada, incluyendo
+las correcciones de ruta exigidas por el PDF de requerimientos
+(`/productos/riesgo`, `/bodegas/criticas`) y la confirmación visual de
+Swagger UI. Solo queda pendiente la evidencia de "endpoints protegidos"
+en vivo (login + JWT + intento sin permisos) antes de dar por cerrado
+el deliverable #4 del PDF por completo.
 
 Siguiente bloque del proyecto: servidor MCP → dashboard → n8n → Docker.
