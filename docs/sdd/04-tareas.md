@@ -131,6 +131,11 @@ completas y verificadas (compilación y/o ejecución confirmada).
 - [x] Generación con datos completos (R29)
 - [x] Marca de agua diagonal BORRADOR (R30)
 - [x] Endpoints `POST`/`GET /ordenes/{id}/pdf`
+- [x] **Rediseño visual** del PDF: barra de título con color, ficha de
+      metadatos (fecha/bodega), tabla de detalle producto/proveedor con
+      encabezados, bloque de total destacado, pie de página. Corrige
+      dos errores de compilación propios de OpenPDF (`NO_BORDER` y
+      `BOX` pertenecen a `Rectangle`, no a `Element`)
 
 ## Corrección post-cierre del backend (descubierta durante pruebas de MCP)
 
@@ -186,21 +191,69 @@ completas y verificadas (compilación y/o ejecución confirmada).
       con cantidad calculada según la fórmula de la skill → publica
       un único resumen del panel con alerta y acciones sugeridas
       correctamente tipadas
+- [ ] Reexportar el workflow con la URL del MCP Client Tool apuntando
+      a `http://mcp-server:3001/sse` (nombre de servicio Docker) en
+      vez de `http://host.docker.internal:3001/sse`, una vez validado
+      el `docker-compose.yml`
 
-## Dashboard
+## Dashboard (CERRADO)
 
-- [ ] `frontend/` conectado a la API real
-- [ ] KPIs, riesgo, órdenes BORRADOR, PDF, botón Aprobar solo ADMIN
+- [x] Sección "Torre de control — LogiTrack IQ" agregada al
+      `dashboard.html` existente (no se creó un frontend separado; se
+      amplió el sistema base, decisión documentada más abajo)
+- [x] `api.js` migrado de `localStorage` a `sessionStorage` (sección
+      11 del PDF) — cambio único y compartido por todo el sistema, ya
+      que se decidió reutilizar un solo login/api en vez de duplicar
+      la capa de sesión
+- [x] KPIs (4 indicadores), movimientos de ayer, ocupación por bodega
+- [x] Resumen diario del panel (narrativa, alertas, acciones sugeridas)
+- [x] Productos en riesgo
+- [x] Tabla "Órdenes en BORRADOR": solo estado BORRADOR, acciones
+      Aprobar/Cancelar (ADMIN)
+- [x] Tabla "Todas las órdenes (histórico)": solo estados que ya
+      salieron de BORRADOR (APROBADA/RECIBIDA/CANCELADA), sin
+      duplicar las que siguen en BORRADOR. Para APROBADA: Recibir/
+      Cancelar (ADMIN); para RECIBIDA/CANCELADA: sin acciones
+      (estados finales)
+- [x] Generar y visualizar PDF de cualquier orden (marca de agua
+      BORRADOR visible cuando corresponde) — modal con visor embebido
+- [x] Botón "Aprobar"/"Recibir"/"Cancelar" visibles solo para ADMIN
+      autenticado
+- [x] Tablas actualizadas automáticamente tras cualquier cambio de
+      estado (BORRADOR ↔ histórico ↔ KPIs, refrescados en conjunto)
+- [x] **Fix de alineación:** altura de fila fija (`height` + CSS) en
+      las tablas de órdenes, para que las filas con botones de acción
+      y las filas sin acciones (estados finales) no queden desalineadas
+
+**Decisión de diseño:** en vez de crear una carpeta `frontend/` nueva
+en la raíz (como sugiere literalmente la "Estructura de referencia"
+del PDF), se amplió el `dashboard.html`/`api.js`/`dashboard.js`/
+`style.css` ya existentes del proyecto base. El PDF permite
+explícitamente adaptar la estructura "siempre que las
+responsabilidades estén separadas de forma clara". Un único login,
+un único `api.js`, un único dashboard — la sección de LogiTrack IQ
+vive claramente delimitada debajo del contenido original, sin romper
+ninguna función heredada.
 
 ## Docker
 
-- [ ] `Dockerfile` del backend
-- [ ] `docker-compose.yml` (backend + mcp-server + n8n, misma red
-      interna, sin depender de `host.docker.internal`)
-- [ ] Build y push a Docker Hub
+- [x] `Dockerfile` del backend (build multi-stage Maven → JRE)
+- [x] `mcp-server/Dockerfile` (Node 20 alpine)
+- [x] `docker-compose.yml` (backend + mcp-server + n8n, misma red
+      interna `logitrack-net`, comunicación por nombre de servicio,
+      sin `host.docker.internal`; `application.properties` y
+      `mcp-server/.env` montados como volumen/env_file en tiempo de
+      ejecución, no incluidos en las imágenes)
+- [ ] Confirmar `docker compose up --build` levanta los 3 servicios
+      correctamente (pendiente de probar)
+- [x] **Decisión:** no se hace push a Docker Hub — como el repo se
+      clona de todas formas en la máquina del centro de estudios,
+      `docker compose build` construye las imágenes ahí mismo desde
+      el código fuente; publicar en Docker Hub sería redundante
 - [ ] Documentar en README las dos rutas válidas de ejecución en la
-      máquina del centro de estudios: vía Docker (recomendada) y
-      manual (clonar + `mvnw`/`npm start`/n8n local)
+      máquina del centro de estudios: vía Docker (`docker compose up
+      --build`, recomendada) y manual (clonar + `mvnw`/`npm start`/n8n
+      local)
 
 ## Cierre SDD y entrega
 
@@ -228,7 +281,19 @@ con evidencia de entrada/salida. El flujo `Resumen diario de
 inventario` en n8n fue ejecutado de punta a punta con éxito,
 respetando todas las reglas de la skill (R32 incluida — sin
 herramienta de aprobación). Tres bugs reales fueron encontrados y
-corregidos durante esta fase (ver tabla arriba).
+corregidos durante esta fase (ver tabla arriba). Pendiente menor:
+reexportar el workflow con la URL de red Docker una vez validado el
+compose.
 
-Siguiente bloque del proyecto: dashboard → Docker → cierre SDD y
-entrega final.
+## Estado del bloque Dashboard (CERRADO)
+
+La torre de control de LogiTrack IQ quedó integrada al dashboard
+existente del proyecto base, con las 6 transiciones de estado de
+orden accesibles desde la interfaz (crear queda excluido a propósito,
+según R32/sección 9: las órdenes las crea el flujo automatizado, no
+el dashboard). Verificado en vivo: aprobar, recibir (con movimiento
+ENTRADA automático confirmado), cancelar, generar/visualizar PDF con
+y sin marca de agua.
+
+Siguiente bloque del proyecto: Docker (verificación final) → cierre
+SDD y entrega.
