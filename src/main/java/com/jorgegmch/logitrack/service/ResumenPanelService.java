@@ -89,9 +89,22 @@ public class ResumenPanelService {
         // R11: una nueva publicación para la misma fecha reemplaza el
         // contenido anterior (delete físico, no soft delete) y queda
         // registrada en auditoría vía AuditoriaListener automáticamente.
+        //
+        // CORRECCION: Hibernate no garantiza que el DELETE se ejecute
+        // en el orden en que se llama en el código — por defecto,
+        // dentro de una misma transacción, reordena las acciones de
+        // flush y ejecuta los INSERT antes que los DELETE. Sin el
+        // flush() explícito aquí, el INSERT del nuevo resumen choca
+        // contra la fila anterior (todavía no borrada físicamente en
+        // la base de datos) y viola la restricción UNIQUE de "fecha"
+        // ("duplicate key value violates unique constraint
+        // resumen_panel_fecha_key"). Forzar el flush aquí obliga a
+        // que el DELETE se ejecute contra la base de datos de
+        // inmediato, antes de construir y guardar el nuevo registro.
         Optional<ResumenPanel> anterior = resumenPanelRepository.findByFecha(fecha);
         if (anterior.isPresent()) {
             resumenPanelRepository.delete(anterior.get());
+            resumenPanelRepository.flush();
         }
 
         ResumenPanel resumen = new ResumenPanel();
