@@ -554,3 +554,115 @@ tbody tr:hover {
 .text-muted {
     color: var(--text-muted);
 }
+
+/* ============================================
+Adiciones para LogiTrack IQ — torre de control
+(agregado al final de style.css existente,
+reutiliza .card, .stat-grid, .stat-card, .badge,
+.table-wrapper, .modal-overlay, .btn, etc. ya
+definidos arriba en este mismo archivo)
+============================================ */
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+}
+
+.stat-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.stat-value-sm {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mov-ayer-grid {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.mov-ayer-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+}
+.mov-ayer-num {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.resumen-narrativa {
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+.subheading {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+.lista-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.item-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+}
+.item-card .item-titulo { font-weight: 700; margin-bottom: 2px; }
+.item-card .item-detalle { color: var(--text-muted); }
+
+.modal-lg {
+    width: 90%;
+    max-width: 900px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+.pdf-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    margin-top: 12px;
+}
+
+.section-divider {
+    margin: 36px 0 20px 0;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border-color);
+}
+.section-divider h2 {
+    font-size: 18px;
+    font-weight: 800;
+}
+.section-divider p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* Altura fija de fila en las tablas de órdenes: evita que las lineas
+divisorias queden desalineadas cuando algunas filas tienen botones de
+accion (Aprobar/Cancelar/Recibir) y otras no. */
+#tablaHistoricoIQ td,
+#tablaOrdenesIQ td {
+    height: 77px;
+    vertical-align: middle;
+}

@@ -97,7 +97,149 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- ============================================
+                LogiTrack IQ — Torre de control
+                ============================================ -->
+
+                <div class="section-divider">
+                    <h2>Torre de control — LogiTrack IQ</h2>
+                    <p>Indicadores de riesgo, órdenes de compra y resumen diario del panel.</p>
+                </div>
+
+                <div id="dashboardAlertSuccessIQ" class="alert alert-success"></div>
+
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Productos en quiebre</div>
+                        <div class="stat-value" id="statQuiebre">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Productos en riesgo</div>
+                        <div class="stat-value" id="statRiesgo">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Órdenes por aprobar</div>
+                        <div class="stat-value" id="statOrdenes">—</div>
+                        <div class="stat-sub" id="statOrdenesMonto"></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Calculado en</div>
+                        <div class="stat-value stat-value-sm" id="statCalculadoEn">—</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Ocupación por bodega</span></div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead><tr><th>Bodega</th><th>Ocupación</th></tr></thead>
+                                <tbody id="tablaOcupacionIQ"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Movimientos de ayer</span></div>
+                        <div class="mov-ayer-grid">
+                            <div class="mov-ayer-item">
+                                <span class="badge badge-success">ENTRADA</span>
+                                <span id="movEntradaIQ" class="mov-ayer-num">—</span>
+                            </div>
+                            <div class="mov-ayer-item">
+                                <span class="badge badge-danger">SALIDA</span>
+                                <span id="movSalidaIQ" class="mov-ayer-num">—</span>
+                            </div>
+                            <div class="mov-ayer-item">
+                                <span class="badge badge-warning">TRANSFERENCIA</span>
+                                <span id="movTransferenciaIQ" class="mov-ayer-num">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Resumen diario</span></div>
+                    <p id="resumenNarrativaIQ" class="resumen-narrativa">Sin resumen publicado todavía.</p>
+                    <div class="grid-2">
+                        <div>
+                            <h4 class="subheading">Alertas</h4>
+                            <div id="listaAlertasIQ" class="lista-items"></div>
+                        </div>
+                        <div>
+                            <h4 class="subheading">Acciones sugeridas</h4>
+                            <div id="listaAccionesIQ" class="lista-items"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Productos en riesgo</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Producto</th><th>Stock total</th><th>Consumo diario</th>
+                                    <th>Punto de reorden</th><th>Días de cobertura</th>
+                                    <th>Estado</th><th>Bodega sugerida</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaRiesgoIQ"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Órdenes en BORRADOR</span>
+                        <button id="btnRefrescarIQ" class="btn btn-secondary btn-sm" type="button">↻ Actualizar</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th><th>Producto</th><th>Proveedor</th><th>Bodega destino</th>
+                                    <th>Cantidad</th><th>Total</th><th>Fecha</th><th>PDF</th><th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaOrdenesIQ"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Todas las órdenes (histórico)</span>
+                        <button id="btnRefrescarHistoricoIQ" class="btn btn-secondary btn-sm" type="button">↻ Actualizar</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th><th>Producto</th><th>Estado</th>
+                                    <th>Cantidad</th><th>Total</th><th>Fecha</th><th>PDF</th><th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaHistoricoIQ"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- FIN Torre de control -->
             </main>
+        </div>
+    </div>
+
+    <!-- Modal PDF de LogiTrack IQ -->
+    <div id="modalPdfIQ" class="modal-overlay">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <span class="modal-title">PDF de la orden</span>
+                <button class="modal-close" id="btnCerrarModalPdfIQ" type="button">&times;</button>
+            </div>
+            <iframe id="framePdfIQ" class="pdf-frame"></iframe>
         </div>
     </div>
 

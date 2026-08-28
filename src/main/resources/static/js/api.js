@@ -1,6 +1,14 @@
 /*
 api.js — Modulo central de comunicacion con la API de LogiTrack.
 Maneja el token JWT, las llamadas fetch, y el manejo de errores HTTP.
+
+CAMBIO: la sesion ahora se guarda en sessionStorage en vez de
+localStorage (02-especificacion.md, seccion 11: el dashboard de
+LogiTrack IQ debe guardar el JWT solo en sessionStorage). Al ser un
+unico login/api compartido entre el sistema base y LogiTrack IQ, este
+cambio aplica a todo el sistema. sessionStorage persiste mientras la
+pestana este abierta, por lo que no afecta la navegacion normal entre
+paginas dentro de la misma sesion de trabajo.
 */
 
 const API_BASE_URL = '';
@@ -13,26 +21,26 @@ const ID_USUARIO_KEY = 'logitrack_id_usuario';
 /* ---------- Manejo de sesion ---------- */
 
 function guardarSesion(idUsuario, token, username, rol) {
-    localStorage.setItem(ID_USUARIO_KEY, idUsuario);
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USERNAME_KEY, username);
-    localStorage.setItem(ROL_KEY, rol);
+    sessionStorage.setItem(ID_USUARIO_KEY, idUsuario);
+    sessionStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(USERNAME_KEY, username);
+    sessionStorage.setItem(ROL_KEY, rol);
 }
 
 function obtenerIdUsuario() {
-    return localStorage.getItem(ID_USUARIO_KEY);
+    return sessionStorage.getItem(ID_USUARIO_KEY);
 }
 
 function obtenerToken() {
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY);
 }
 
 function obtenerUsername() {
-    return localStorage.getItem(USERNAME_KEY);
+    return sessionStorage.getItem(USERNAME_KEY);
 }
 
 function obtenerRol() {
-    return localStorage.getItem(ROL_KEY);
+    return sessionStorage.getItem(ROL_KEY);
 }
 
 function esAdmin() {
@@ -40,10 +48,10 @@ function esAdmin() {
 }
 
 function cerrarSesion() {
-    localStorage.removeItem(ID_USUARIO_KEY);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USERNAME_KEY);
-    localStorage.removeItem(ROL_KEY);
+    sessionStorage.removeItem(ID_USUARIO_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USERNAME_KEY);
+    sessionStorage.removeItem(ROL_KEY);
     window.location.href = '/html/login.html';
 }
 
@@ -88,8 +96,16 @@ async function apiFetch(endpoint, options = {}) {
         return null;
     }
 
-    let cuerpo = null;
     const contentType = respuesta.headers.get('content-type');
+
+    if (contentType && contentType.includes('application/pdf')) {
+        if (!respuesta.ok) {
+            throw new Error('No se pudo obtener el PDF (status ' + respuesta.status + ').');
+        }
+        return respuesta.blob();
+    }
+
+    let cuerpo = null;
     if (contentType && contentType.includes('application/json')) {
         cuerpo = await respuesta.json();
     }
@@ -109,7 +125,7 @@ function apiGet(endpoint) {
 }
 
 function apiPost(endpoint, datos) {
-    return apiFetch(endpoint, { method: 'POST', body: JSON.stringify(datos) });
+    return apiFetch(endpoint, { method: 'POST', body: datos !== undefined ? JSON.stringify(datos) : undefined });
 }
 
 function apiPut(endpoint, datos) {
