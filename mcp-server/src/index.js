@@ -41,10 +41,8 @@ async function login() {
 
     const datos = await respuesta.json();
 
-    // Intento defensivo: el nombre exacto del campo del JWT en
-    // LoginResponse.java no estaba confirmado al escribir este archivo.
-    // Se prueban los nombres mas comunes; si ninguno aparece, se lanza
-    // un error claro con el cuerpo real de la respuesta para diagnosticar.
+    // Confirmado por prueba real (Thunder Client): el campo del JWT en
+    // LoginResponse.java es "token".
     const token = datos.token ?? datos.jwt ?? datos.accessToken;
 
     if (!token) {
@@ -96,106 +94,127 @@ async function apiFetch(path, options = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// Servidor MCP y las 6 herramientas exactas (02-especificacion.md, seccion 9)
+// Fabrica del servidor MCP y las 6 herramientas exactas
+// (02-especificacion.md, seccion 9).
+//
+// CORRECCION 1: el SDK de MCP no permite que una misma instancia de
+// McpServer se conecte a mas de un transporte ("Already connected to
+// a transport"). Cada conexion SSE entrante necesita su PROPIA
+// instancia de servidor. Por eso esto es una funcion fabrica en vez
+// de una instancia global unica — se llama una vez por cada request
+// a /sse.
+//
+// CORRECCION 2: los campos numericos usan z.number().int().min(1) en
+// vez de z.number().int().positive(). Zod traduce .positive() a la
+// palabra clave JSON Schema "exclusiveMinimum", que la API de Gemini
+// no soporta (rechaza las herramientas con 400 Bad Request al
+// listarlas). .min(1) es equivalente en semantica (entero positivo,
+// minimo 1) pero se traduce a "minimum", que si es compatible.
 // ---------------------------------------------------------------------------
 
-const server = new McpServer({
-    name: "logitrack-iq-mcp-server",
-    version: "1.0.0",
-});
+function crearServidorMcp() {
+    const server = new McpServer({
+        name: "logitrack-iq-mcp-server",
+        version: "1.0.0",
+    });
 
-server.tool(
-    "consultar_stock_producto",
-    "Consulta el stock total calculado de un producto especifico, agregado desde los movimientos de inventario.",
-    { productoId: z.number().int().positive() },
-    async ({ productoId }) => {
-        const resultado = await apiFetch(`/productos/${productoId}/stock`);
-        return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
-    }
-);
+    server.tool(
+        "consultar_stock_producto",
+        "Consulta el stock total calculado de un producto especifico, agregado desde los movimientos de inventario.",
+        { productoId: z.number().int().min(1) },
+        async ({ productoId }) => {
+            const resultado = await apiFetch(`/productos/${productoId}/stock`);
+            return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
+        }
+    );
 
-server.tool(
-    "consultar_bodegas_criticas",
-    "Lista las bodegas con ocupacion critica (mayor o igual al 90%).",
-    {},
-    async () => {
-        const resultado = await apiFetch("/bodegas/criticas");
-        return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
-    }
-);
+    server.tool(
+        "consultar_bodegas_criticas",
+        "Lista las bodegas con ocupacion critica (mayor o igual al 90%).",
+        {},
+        async () => {
+            const resultado = await apiFetch("/bodegas/criticas");
+            return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
+        }
+    );
 
-server.tool(
-    "consultar_productos_en_riesgo",
-    "Lista los productos actualmente en riesgo de quiebre de stock (stock por debajo del punto de reorden).",
-    {},
-    async () => {
-        const resultado = await apiFetch("/productos/riesgo");
-        return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
-    }
-);
+    server.tool(
+        "consultar_productos_en_riesgo",
+        "Lista los productos actualmente en riesgo de quiebre de stock (stock por debajo del punto de reorden).",
+        {},
+        async () => {
+            const resultado = await apiFetch("/productos/riesgo");
+            return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
+        }
+    );
 
-server.tool(
-    "consultar_kpis",
-    "Obtiene el resumen completo de indicadores del dashboard de LogiTrack IQ.",
-    {},
-    async () => {
-        const resultado = await apiFetch("/kpis");
-        return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
-    }
-);
+    server.tool(
+        "consultar_kpis",
+        "Obtiene el resumen completo de indicadores del dashboard de LogiTrack IQ.",
+        {},
+        async () => {
+            const resultado = await apiFetch("/kpis");
+            return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
+        }
+    );
 
-server.tool(
-    "crear_orden_borrador",
-    "Crea una orden de compra en estado BORRADOR. Solo crea el registro; NO genera PDF ni la aprueba (R32: no existe herramienta para aprobar ordenes).",
-    {
-        productoId: z.number().int().positive(),
-        proveedorId: z.number().int().positive(),
-        bodegaDestinoId: z.number().int().positive(),
-        cantidad: z.number().int().positive(),
-        precioUnitario: z.number().nonnegative(),
-    },
-    async ({ productoId, proveedorId, bodegaDestinoId, cantidad, precioUnitario }) => {
-        const resultado = await apiFetch("/ordenes", {
-            method: "POST",
-            body: JSON.stringify({ productoId, proveedorId, bodegaDestinoId, cantidad, precioUnitario }),
-        });
-        return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
-    }
-);
+    server.tool(
+        "crear_orden_borrador",
+        "Crea una orden de compra en estado BORRADOR. Solo crea el registro; NO genera PDF ni la aprueba (R32: no existe herramienta para aprobar ordenes).",
+        {
+            productoId: z.number().int().min(1),
+            proveedorId: z.number().int().min(1),
+            bodegaDestinoId: z.number().int().min(1),
+            cantidad: z.number().int().min(1),
+            precioUnitario: z.number().nonnegative(),
+        },
+        async ({ productoId, proveedorId, bodegaDestinoId, cantidad, precioUnitario }) => {
+            const resultado = await apiFetch("/ordenes", {
+                method: "POST",
+                body: JSON.stringify({ productoId, proveedorId, bodegaDestinoId, cantidad, precioUnitario }),
+            });
+            return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
+        }
+    );
 
-server.tool(
-    "publicar_resumen",
-    "Publica el resumen diario del panel (fecha, narrativa, alertas, acciones sugeridas). Reemplaza el resumen existente para la misma fecha.",
-    {
-        fecha: z.string().describe("Fecha en formato YYYY-MM-DD"),
-        narrativa: z.string(),
-        alertas: z.array(z.object({
-            severidad: z.enum(["BAJA", "MEDIA", "ALTA"]),
-            titulo: z.string(),
-            detalle: z.string(),
-            productoId: z.number().int().positive().optional(),
-            ordenId: z.number().int().positive().optional(),
-            bodegaId: z.number().int().positive().optional(),
-        })),
-        accionesSugeridas: z.array(z.object({
-            descripcion: z.string(),
-            productoId: z.number().int().positive().optional(),
-            ordenId: z.number().int().positive().optional(),
-            bodegaId: z.number().int().positive().optional(),
-        })),
-    },
-    async ({ fecha, narrativa, alertas, accionesSugeridas }) => {
-        const resultado = await apiFetch("/panel/resumen", {
-            method: "POST",
-            body: JSON.stringify({ fecha, narrativa, alertas, accionesSugeridas }),
-        });
-        return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
-    }
-);
+    server.tool(
+        "publicar_resumen",
+        "Publica el resumen diario del panel (fecha, narrativa, alertas, acciones sugeridas). Reemplaza el resumen existente para la misma fecha.",
+        {
+            fecha: z.string().describe("Fecha en formato YYYY-MM-DD"),
+            narrativa: z.string(),
+            alertas: z.array(z.object({
+                severidad: z.enum(["BAJA", "MEDIA", "ALTA"]),
+                titulo: z.string(),
+                detalle: z.string(),
+                productoId: z.number().int().min(1).optional(),
+                ordenId: z.number().int().min(1).optional(),
+                bodegaId: z.number().int().min(1).optional(),
+            })),
+            accionesSugeridas: z.array(z.object({
+                tipo: z.enum(["REVISAR_ORDEN", "REVISAR_PRODUCTO", "REVISAR_BODEGA"]),
+                descripcion: z.string(),
+                productoId: z.number().int().min(1).optional(),
+                ordenId: z.number().int().min(1).optional(),
+                bodegaId: z.number().int().min(1).optional(),
+            })),
+        },
+        async ({ fecha, narrativa, alertas, accionesSugeridas }) => {
+            const resultado = await apiFetch("/panel/resumen", {
+                method: "POST",
+                body: JSON.stringify({ fecha, narrativa, alertas, accionesSugeridas }),
+            });
+            return { content: [{ type: "text", text: JSON.stringify(resultado) }] };
+        }
+    );
+
+    return server;
+}
 
 // ---------------------------------------------------------------------------
 // Transporte SSE sobre Express, para que n8n (MCP Client Tool) se conecte
-// como cliente por HTTP. Patron oficial del SDK v1.x.
+// como cliente por HTTP. Patron oficial del SDK v1.x. Cada conexion
+// entrante crea su propia instancia de McpServer (ver crearServidorMcp).
 // ---------------------------------------------------------------------------
 
 const app = express();
@@ -204,6 +223,7 @@ app.use(express.json());
 const transportesActivos = {};
 
 app.get("/sse", async (req, res) => {
+    const server = crearServidorMcp();
     const transporte = new SSEServerTransport("/messages", res);
     transportesActivos[transporte.sessionId] = transporte;
 
