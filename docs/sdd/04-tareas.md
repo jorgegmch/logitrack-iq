@@ -121,9 +121,11 @@ completas y verificadas (compilación y/o ejecución confirmada).
       capturas confirmando que las 30+ rutas se renderizan correctamente
       y sin errores, incluidas `/productos/riesgo` y `/bodegas/criticas`
       ya corregidas
-- [ ] Evidencia de endpoints **protegidos** en Swagger (login real + JWT
-      + intento sin token + intento con rol incorrecto) — pendiente,
-      siguiente paso inmediato
+- [x] Evidencia de endpoints **protegidos** en Swagger (login real + JWT
+      + intento sin token + intento con rol incorrecto) — ver
+      `docs/capturas/swagger-endpoints-protegidos/`: sin token (403),
+      login admin, Authorize, endpoint autorizado (200), login
+      AGENTE, intento de AGENTE sobre endpoint exclusivo-ADMIN (403)
 
 ## Documento PDF de la orden
 
@@ -275,16 +277,16 @@ ninguna función heredada.
 - [ ] Diagrama n8n → MCP → API → BD → dashboard
 - [ ] Video 4-6 min
 
-## Estado del backend + pruebas (BLOQUE CERRADO, con una corrección posterior)
+## Estado del backend + pruebas (BLOQUE CERRADO — sin pendientes)
 
 La capa de backend + pruebas queda completa y verificada, incluyendo
 las correcciones de ruta exigidas por el PDF de requerimientos
 (`/productos/riesgo`, `/bodegas/criticas`), la confirmación visual de
-Swagger UI, y el fix de `ResumenPanelService` documentado arriba
-(descubierto durante las pruebas reales de MCP/n8n, no cubierto por
-los tests automatizados existentes). Único pendiente real: la
-evidencia de "endpoints protegidos" en vivo (login + JWT + intento sin
-permisos) — siguiente tarea inmediata.
+Swagger UI, el fix de `ResumenPanelService` documentado arriba
+(descubierto durante las pruebas reales de MCP/n8n), y la evidencia de
+endpoints protegidos en vivo (login real + JWT + 401/403 por falta de
+token y por rol incorrecto). El deliverable #4 del PDF queda
+completo.
 
 ## Estado del bloque MCP + n8n (CERRADO)
 
@@ -316,5 +318,5 @@ extremo a extremo: dashboard, generación de PDF, y ejecución completa
 del flujo de n8n contra el backend dockerizado. Único pendiente:
 documentar los pasos de ejecución en el README.
 
-Siguiente bloque del proyecto: evidencia de endpoints protegidos en
-Swagger → cierre SDD y entrega final (README, diagrama, video).
+Siguiente bloque del proyecto: cierre SDD y entrega final (README,
+diagrama, video).
