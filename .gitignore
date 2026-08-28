@@ -34,3 +34,7 @@ build/
 
 ### Configuración local con credenciales ###
 src/main/resources/application.properties
+
+### Servidor MCP (Node.js) ###
+mcp-server/node_modules/
+mcp-server/.env
