@@ -123,7 +123,7 @@ completas y verificadas (compilación y/o ejecución confirmada).
       ya corregidas
 - [ ] Evidencia de endpoints **protegidos** en Swagger (login real + JWT
       + intento sin token + intento con rol incorrecto) — pendiente,
-      ver explicación abajo
+      siguiente paso inmediato
 
 ## Documento PDF de la orden
 
@@ -136,6 +136,8 @@ completas y verificadas (compilación y/o ejecución confirmada).
       encabezados, bloque de total destacado, pie de página. Corrige
       dos errores de compilación propios de OpenPDF (`NO_BORDER` y
       `BOX` pertenecen a `Rectangle`, no a `Element`)
+- [x] Verificado dentro del contenedor Docker: marca de agua BORRADOR
+      se sigue renderizando correctamente sobre el nuevo layout
 
 ## Corrección post-cierre del backend (descubierta durante pruebas de MCP)
 
@@ -184,17 +186,23 @@ completas y verificadas (compilación y/o ejecución confirmada).
       ramas de éxito/error
 - [x] Export del flujo + capturas de ejecución exitosa y error
       controlado — ver `docs/capturas/mcp-tools/` y
-      `n8n/resumen-diario-inventario.json` (export real desde n8n,
-      no el borrador inicial)
+      `n8n/resumen-diario-inventario.json`
 - [x] Ejecución end-to-end verificada: consulta KPIs y riesgo → crea
       máximo una orden BORRADOR para el primer producto en riesgo,
       con cantidad calculada según la fórmula de la skill → publica
       un único resumen del panel con alerta y acciones sugeridas
       correctamente tipadas
-- [ ] Reexportar el workflow con la URL del MCP Client Tool apuntando
-      a `http://mcp-server:3001/sse` (nombre de servicio Docker) en
-      vez de `http://host.docker.internal:3001/sse`, una vez validado
-      el `docker-compose.yml`
+- [x] Verificado también dentro del entorno dockerizado, con el
+      endpoint del nodo "MCP Client Tool" apuntando a
+      `http://mcp-server:3001/sse` (nombre de servicio Docker)
+
+**Decisión sobre la URL del MCP Client Tool:** el JSON exportado en el
+repo mantiene `http://host.docker.internal:3001/sse` como valor por
+defecto (funciona para el modo manual/mixto: n8n en Docker suelto +
+backend/mcp-server corriendo como procesos locales). Cuando se ejecuta
+el stack completo vía `docker compose up`, hay que cambiar ese campo a
+`http://mcp-server:3001/sse` antes de correr el workflow — documentado
+en el README.
 
 ## Dashboard (CERRADO)
 
@@ -224,6 +232,8 @@ completas y verificadas (compilación y/o ejecución confirmada).
 - [x] **Fix de alineación:** altura de fila fija (`height` + CSS) en
       las tablas de órdenes, para que las filas con botones de acción
       y las filas sin acciones (estados finales) no queden desalineadas
+- [x] Verificado dentro del contenedor Docker: dashboard, KPIs,
+      histórico y generación de PDF funcionan igual que en modo manual
 
 **Decisión de diseño:** en vez de crear una carpeta `frontend/` nueva
 en la raíz (como sugiere literalmente la "Estructura de referencia"
@@ -235,17 +245,19 @@ un único `api.js`, un único dashboard — la sección de LogiTrack IQ
 vive claramente delimitada debajo del contenido original, sin romper
 ninguna función heredada.
 
-## Docker
+## Docker (CERRADO)
 
 - [x] `Dockerfile` del backend (build multi-stage Maven → JRE)
 - [x] `mcp-server/Dockerfile` (Node 20 alpine)
 - [x] `docker-compose.yml` (backend + mcp-server + n8n, misma red
-      interna `logitrack-net`, comunicación por nombre de servicio,
-      sin `host.docker.internal`; `application.properties` y
-      `mcp-server/.env` montados como volumen/env_file en tiempo de
-      ejecución, no incluidos en las imágenes)
-- [ ] Confirmar `docker compose up --build` levanta los 3 servicios
-      correctamente (pendiente de probar)
+      interna `logitrack-net`, comunicación por nombre de servicio;
+      `application.properties` y `mcp-server/.env` montados como
+      volumen/env_file en tiempo de ejecución, no incluidos en las
+      imágenes)
+- [x] `docker compose up --build` levanta los 3 servicios
+      correctamente — verificado: backend arranca limpio, n8n
+      accesible, dashboard funcional, flujo n8n → mcp-server → backend
+      confirmado con la URL de red Docker
 - [x] **Decisión:** no se hace push a Docker Hub — como el repo se
       clona de todas formas en la máquina del centro de estudios,
       `docker compose build` construye las imágenes ahí mismo desde
@@ -253,7 +265,8 @@ ninguna función heredada.
 - [ ] Documentar en README las dos rutas válidas de ejecución en la
       máquina del centro de estudios: vía Docker (`docker compose up
       --build`, recomendada) y manual (clonar + `mvnw`/`npm start`/n8n
-      local)
+      local), incluyendo el ajuste de URL del MCP Client Tool según la
+      ruta elegida
 
 ## Cierre SDD y entrega
 
@@ -269,21 +282,20 @@ las correcciones de ruta exigidas por el PDF de requerimientos
 (`/productos/riesgo`, `/bodegas/criticas`), la confirmación visual de
 Swagger UI, y el fix de `ResumenPanelService` documentado arriba
 (descubierto durante las pruebas reales de MCP/n8n, no cubierto por
-los tests automatizados existentes). Solo queda pendiente la evidencia
-de "endpoints protegidos" en vivo (login + JWT + intento sin permisos)
-antes de dar por cerrado el deliverable #4 del PDF por completo.
+los tests automatizados existentes). Único pendiente real: la
+evidencia de "endpoints protegidos" en vivo (login + JWT + intento sin
+permisos) — siguiente tarea inmediata.
 
 ## Estado del bloque MCP + n8n (CERRADO)
 
 Las 6 herramientas MCP están implementadas, probadas contra el
 backend real (login real de `agente_mcp` confirmado), y documentadas
 con evidencia de entrada/salida. El flujo `Resumen diario de
-inventario` en n8n fue ejecutado de punta a punta con éxito,
-respetando todas las reglas de la skill (R32 incluida — sin
-herramienta de aprobación). Tres bugs reales fueron encontrados y
-corregidos durante esta fase (ver tabla arriba). Pendiente menor:
-reexportar el workflow con la URL de red Docker una vez validado el
-compose.
+inventario` en n8n fue ejecutado de punta a punta con éxito, tanto en
+modo manual como dentro del entorno dockerizado, respetando todas las
+reglas de la skill (R32 incluida — sin herramienta de aprobación).
+Tres bugs reales fueron encontrados y corregidos durante esta fase
+(ver tabla arriba).
 
 ## Estado del bloque Dashboard (CERRADO)
 
@@ -291,9 +303,18 @@ La torre de control de LogiTrack IQ quedó integrada al dashboard
 existente del proyecto base, con las 6 transiciones de estado de
 orden accesibles desde la interfaz (crear queda excluido a propósito,
 según R32/sección 9: las órdenes las crea el flujo automatizado, no
-el dashboard). Verificado en vivo: aprobar, recibir (con movimiento
-ENTRADA automático confirmado), cancelar, generar/visualizar PDF con
-y sin marca de agua.
+el dashboard). Verificado en vivo, tanto manual como en Docker:
+aprobar, recibir (con movimiento ENTRADA automático confirmado),
+cancelar, generar/visualizar PDF con y sin marca de agua.
 
-Siguiente bloque del proyecto: Docker (verificación final) → cierre
-SDD y entrega.
+## Estado del bloque Docker (CERRADO)
+
+Los 3 servicios (backend, mcp-server, n8n) levantan correctamente con
+un solo comando (`docker compose up --build`), comunicándose por
+nombre de servicio dentro de la misma red interna. Verificado de
+extremo a extremo: dashboard, generación de PDF, y ejecución completa
+del flujo de n8n contra el backend dockerizado. Único pendiente:
+documentar los pasos de ejecución en el README.
+
+Siguiente bloque del proyecto: evidencia de endpoints protegidos en
+Swagger → cierre SDD y entrega final (README, diagrama, video).
