@@ -132,18 +132,60 @@ completas y verificadas (compilación y/o ejecución confirmada).
 - [x] Marca de agua diagonal BORRADOR (R30)
 - [x] Endpoints `POST`/`GET /ordenes/{id}/pdf`
 
+## Corrección post-cierre del backend (descubierta durante pruebas de MCP)
+
+- [x] **Fix:** `ResumenPanelService.publicarResumen` violaba la
+      restricción `UNIQUE` de `fecha` al reemplazar el resumen del día
+      (`duplicate key value violates unique constraint
+      "resumen_panel_fecha_key"`). Causa: Hibernate reordena el flush
+      de una transacción y ejecutaba el `INSERT` antes que el
+      `DELETE` del resumen anterior, aunque el código los llama en
+      ese orden. Corregido con `resumenPanelRepository.flush()`
+      explícito inmediatamente después del `delete()`. No afecta
+      ninguna regla ni test documentado en `evidencia-sdd.md` — es un
+      bug de comportamiento real de Hibernate no cubierto por los
+      tests existentes (ninguno probaba "publicar dos veces el mismo
+      día contra la base de datos real").
+
 ## Servidor MCP
 
-- [ ] Inicializar proyecto en `mcp-server/`
-- [ ] Implementar las 6 herramientas exactas
-- [ ] Usuario `agente_mcp` conectado y probado
-- [ ] Evidencia de entrada/salida por herramienta
+- [x] Inicializar proyecto en `mcp-server/`
+- [x] Implementar las 6 herramientas exactas
+- [x] Usuario `agente_mcp` conectado y probado (login real confirmado
+      end-to-end: Thunder Client → backend, y servidor MCP → backend)
+- [x] Evidencia de entrada/salida por herramienta — ver
+      `mcp-server/evidencia-mcp.md` y `docs/capturas/mcp-tools/`
+- [x] **Fix:** `Already connected to a transport` — el servidor usaba
+      una única instancia global de `McpServer`, que no soporta más
+      de una conexión SSE. Corregido con una fábrica
+      (`crearServidorMcp()`) que crea una instancia nueva por cada
+      conexión entrante en `/sse`
+- [x] **Fix:** Gemini rechazaba las 6 herramientas con `400
+      Bad Request` (`Unknown name "exclusiveMinimum"`) — Zod traduce
+      `.positive()` a esa palabra clave de JSON Schema, no soportada
+      por la API de Gemini. Corregido reemplazando `.positive()` por
+      `.min(1)` en todos los campos numéricos de las 6 tools
+- [x] **Fix:** el esquema de `publicar_resumen` nunca definió el
+      campo `tipo` en `accionesSugeridas`, aunque el backend lo exige
+      (`AccionSugeridaDTO`). Corregido agregando
+      `tipo: z.enum([...])` al esquema
 
 ## Skill y flujo n8n
 
-- [ ] `skills/operacion-logitrack/SKILL.md`
-- [ ] Flujo `Resumen diario de inventario` (JSON)
-- [ ] Export del flujo + capturas de ejecución exitosa y error controlado
+- [x] `skills/operacion-logitrack/SKILL.md`
+- [x] Flujo `Resumen diario de inventario` (JSON) — construido con
+      Schedule Trigger (6am America/Bogota), AI Agent (Google Gemini
+      Chat Model) + MCP Client Tool apuntando al servidor MCP, y
+      ramas de éxito/error
+- [x] Export del flujo + capturas de ejecución exitosa y error
+      controlado — ver `docs/capturas/mcp-tools/` y
+      `n8n/resumen-diario-inventario.json` (export real desde n8n,
+      no el borrador inicial)
+- [x] Ejecución end-to-end verificada: consulta KPIs y riesgo → crea
+      máximo una orden BORRADOR para el primer producto en riesgo,
+      con cantidad calculada según la fórmula de la skill → publica
+      un único resumen del panel con alerta y acciones sugeridas
+      correctamente tipadas
 
 ## Dashboard
 
@@ -153,8 +195,12 @@ completas y verificadas (compilación y/o ejecución confirmada).
 ## Docker
 
 - [ ] `Dockerfile` del backend
-- [ ] `docker-compose.yml` (backend + n8n)
+- [ ] `docker-compose.yml` (backend + mcp-server + n8n, misma red
+      interna, sin depender de `host.docker.internal`)
 - [ ] Build y push a Docker Hub
+- [ ] Documentar en README las dos rutas válidas de ejecución en la
+      máquina del centro de estudios: vía Docker (recomendada) y
+      manual (clonar + `mvnw`/`npm start`/n8n local)
 
 ## Cierre SDD y entrega
 
@@ -163,13 +209,26 @@ completas y verificadas (compilación y/o ejecución confirmada).
 - [ ] Diagrama n8n → MCP → API → BD → dashboard
 - [ ] Video 4-6 min
 
-## Estado del backend + pruebas (BLOQUE CERRADO)
+## Estado del backend + pruebas (BLOQUE CERRADO, con una corrección posterior)
 
 La capa de backend + pruebas queda completa y verificada, incluyendo
 las correcciones de ruta exigidas por el PDF de requerimientos
-(`/productos/riesgo`, `/bodegas/criticas`) y la confirmación visual de
-Swagger UI. Solo queda pendiente la evidencia de "endpoints protegidos"
-en vivo (login + JWT + intento sin permisos) antes de dar por cerrado
-el deliverable #4 del PDF por completo.
+(`/productos/riesgo`, `/bodegas/criticas`), la confirmación visual de
+Swagger UI, y el fix de `ResumenPanelService` documentado arriba
+(descubierto durante las pruebas reales de MCP/n8n, no cubierto por
+los tests automatizados existentes). Solo queda pendiente la evidencia
+de "endpoints protegidos" en vivo (login + JWT + intento sin permisos)
+antes de dar por cerrado el deliverable #4 del PDF por completo.
 
-Siguiente bloque del proyecto: servidor MCP → dashboard → n8n → Docker.
+## Estado del bloque MCP + n8n (CERRADO)
+
+Las 6 herramientas MCP están implementadas, probadas contra el
+backend real (login real de `agente_mcp` confirmado), y documentadas
+con evidencia de entrada/salida. El flujo `Resumen diario de
+inventario` en n8n fue ejecutado de punta a punta con éxito,
+respetando todas las reglas de la skill (R32 incluida — sin
+herramienta de aprobación). Tres bugs reales fueron encontrados y
+corregidos durante esta fase (ver tabla arriba).
+
+Siguiente bloque del proyecto: dashboard → Docker → cierre SDD y
+entrega final.
