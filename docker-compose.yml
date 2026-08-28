@@ -1,0 +1,74 @@
+# ============================================
+# docker-compose.yml — LogiTrack IQ
+# Servicios: backend (Spring Boot) + mcp-server (Node) + n8n
+# Los tres viven en la misma red interna de Docker y se
+# comunican por nombre de servicio (sin host.docker.internal).
+# La base de datos sigue siendo Supabase (nube), no se
+# dockeriza aqui.
+# ============================================
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: logitrack-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      # application.properties NO se incluye en la imagen (contiene
+      # credenciales de Supabase y el secreto JWT). Se monta en tiempo
+      # de ejecucion desde su ubicacion real en el proyecto.
+      - ./src/main/resources/application.properties:/app/config/application.properties:ro
+    command: >
+      java -jar app.jar
+      --spring.config.additional-location=file:/app/config/application.properties
+    networks:
+      - logitrack-net
+    restart: unless-stopped
+
+  mcp-server:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    container_name: logitrack-mcp-server
+    ports:
+      - "3001:3001"
+    env_file:
+      # Igual que application.properties: el .env real (con la
+      # contraseña de agente_mcp) no viaja en el repo, se crea a
+      # partir de mcp-server/.env.example.
+      - ./mcp-server/.env
+    environment:
+      # Dentro de la red de Docker, el backend se alcanza por su
+      # nombre de servicio, no por localhost.
+      - API_BASE_URL=http://backend:8080
+    depends_on:
+      - backend
+    networks:
+      - logitrack-net
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: logitrack-n8n
+    ports:
+      - "5679:5678"
+    environment:
+      - GENERIC_TIMEZONE=America/Bogota
+      - TZ=America/Bogota
+      - N8N_SECURE_COOKIE=false
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - mcp-server
+    networks:
+      - logitrack-net
+    restart: unless-stopped
+
+networks:
+  logitrack-net:
+    driver: bridge
+
+volumes:
+  n8n_data:
