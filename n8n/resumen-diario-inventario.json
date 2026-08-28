@@ -1,0 +1,237 @@
+{
+  "name": "Resumen diario de inventario",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "99c0f33e-aa09-40cf-bfb1-6a4d065201d9",
+      "name": "Schedule Trigger 6am Bogota",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -768,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1a1a1a1-0000-4000-8000-000000000010",
+              "name": "fechaHoy",
+              "value": "={{$now.setZone('America/Bogota').toFormat('yyyy-LL-dd')}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "99d2cecf-fc75-4490-ad47-60db53f75e11",
+      "name": "Preparar fecha Bogota",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -528,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Fecha de hoy en America/Bogota: {{$json.fechaHoy}}.\n\nEjecuta el resumen diario de inventario de LogiTrack IQ siguiendo estrictamente las reglas del sistema. Al terminar, responde con un resumen breve de lo que hiciste: si creaste una orden (con qué producto y cantidad), y si publicaste el resumen del panel correctamente.",
+        "options": {
+          "systemMessage": "Eres el agente operativo de LogiTrack IQ. Sigues estas reglas sin excepción:\n\n1. Consulta siempre primero consultar_kpis y consultar_productos_en_riesgo antes de cualquier otra acción.\n2. Puedes crear como máximo UNA orden de compra en BORRADOR por ejecución, únicamente para el PRIMER producto listado por consultar_productos_en_riesgo.\n3. La cantidad de esa orden se calcula como: ceil(max(1, puntoReorden * 2 - stockTotal)).\n4. Usa proveedorId y bodegaDestinoId exactamente como vienen en la respuesta de consultar_productos_en_riesgo para ese producto, nunca los inventes.\n5. NUNCA apruebes, canceles ni recibas órdenes. No existe herramienta para eso.\n6. Al final, publica UN ÚNICO resumen con publicar_resumen que cumpla este contrato exacto:\n   - fecha: la fecha de hoy en America/Bogota que se te dio en el mensaje, formato YYYY-MM-DD.\n   - narrativa: entre 20 y 500 caracteres.\n   - alertas: arreglo (puede ir vacío). Cada alerta: severidad (BAJA/MEDIA/ALTA), titulo, detalle, y al menos uno de productoId/ordenId/bodegaId.\n   - accionesSugeridas: arreglo (puede ir vacío). Cada acción: tipo (REVISAR_ORDEN/REVISAR_PRODUCTO/REVISAR_BODEGA), descripcion, y exactamente uno de ordenId/productoId/bodegaId.\n7. Si no hay productos en riesgo, no crees ninguna orden, pero igual publica el resumen del día indicándolo.\n8. Si una herramienta falla, detente y repórtalo claramente en tu respuesta final, no asumas éxito.",
+          "maxIterations": 15
+        }
+      },
+      "id": "cec4475a-1d54-4c6f-a104-e7fe1a164ea6",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -288,
+        80
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "http://host.docker.internal:3001/sse",
+        "options": {}
+      },
+      "id": "18435add-8f70-498e-ae30-3c9a487b3113",
+      "name": "MCP Client Tool - LogiTrack IQ",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1a1a1a1-0000-4000-8000-000000000020",
+              "name": "resultado",
+              "value": "exito",
+              "type": "string"
+            },
+            {
+              "id": "f1a1a1a1-0000-4000-8000-000000000021",
+              "name": "detalle",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1dd0de48-d842-47b2-92b5-43907d6dddda",
+      "name": "Registrar ejecución exitosa",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1a1a1a1-0000-4000-8000-000000000030",
+              "name": "resultado",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "f1a1a1a1-0000-4000-8000-000000000031",
+              "name": "detalle",
+              "value": "={{$json.error?.message ?? $json.error ?? 'Error desconocido en la ejecución del agente'}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3d60f4a3-a9d1-4f4e-9f8b-1fb46a3e9f79",
+      "name": "Registrar error controlado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        304
+      ],
+      "id": "91ed5099-8540-4ef1-ae26-bb63e28f4017",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2DFY42Ozat3LjwlL",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger 6am Bogota": {
+      "main": [
+        [
+          {
+            "node": "Preparar fecha Bogota",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar fecha Bogota": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client Tool - LogiTrack IQ": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Registrar ejecución exitosa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar error controlado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a46ab1b3-5ee1-42e1-8a74-325c9d1a082c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "796cbc67b1aa4e9cf9bd628011c93984fee6bb0e0024c4d91cdee5974ab841a4"
+  },
+  "id": "Ikij0Med2BuZA4nG",
+  "tags": []
+}
