@@ -219,7 +219,7 @@ exportado).
 |---|---|---|---|
 | `admin` | `Admin123!` | `ADMIN` | Acceso completo: aprobar, recibir, cancelar órdenes, gestión de usuarios |
 | `empleado` | `Empleado123!` | `EMPLEADO` | Registro manual de movimientos |
-| `agente_mcp` | *(ver `.env`)* | `AGENTE` | Usuario técnico del servidor MCP — consulta y crea órdenes en borrador, nunca aprueba |
+| `agente_mcp` | `Agente123!` | `AGENTE` | Usuario técnico del servidor MCP — consulta y crea órdenes en borrador, nunca aprueba |
 
 ---
 
