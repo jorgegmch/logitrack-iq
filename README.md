@@ -4,8 +4,6 @@
 con detección automática de riesgo de stock, propuesta de compra vía
 IA/MCP, dashboard de gestión y flujo diario automatizado con n8n.
 
-Proyecto integrador — Módulo IA-2, Campuslands (Grupo C4).
-
 ---
 
 ## 📋 Tabla de contenidos
