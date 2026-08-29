@@ -266,18 +266,34 @@ ninguna función heredada.
       clona de todas formas en la máquina del centro de estudios,
       `docker compose build` construye las imágenes ahí mismo desde
       el código fuente; publicar en Docker Hub sería redundante
-- [ ] Documentar en README las dos rutas válidas de ejecución en la
+- [x] Documentar en README las dos rutas válidas de ejecución en la
       máquina del centro de estudios: vía Docker (`docker compose up
       --build`, recomendada) y manual (clonar + `mvnw`/`npm start`/n8n
       local), incluyendo el ajuste de URL del MCP Client Tool según la
-      ruta elegida
+      ruta elegida — ver sección "🚀 Instalación y ejecución" del
+      `README.md`
 
 ## Cierre SDD y entrega
 
-- [ ] `docs/sdd/evidencia-sdd.md` — en construcción
-- [ ] README definitivo
-- [ ] Diagrama n8n → MCP → API → BD → dashboard
+- [x] `docs/sdd/evidencia-sdd.md` — finalizado: enlaces a los 4
+      documentos, evidencia de endpoints protegidos agregada (sección
+      3.16), referencias a capturas inexistentes corregidas, reflexión
+      final revisada (146 palabras)
+- [x] README definitivo — instalación (Docker y manual), usuarios de
+      prueba, rutas principales, evidencia de MCP y Swagger embebida,
+      diagrama de arquitectura, espacio para el video
+- [x] Diagrama n8n → MCP → API → BD → dashboard (`docs/diagrama-arquitectura.svg`)
 - [ ] Video 4-6 min
+
+## Nota menor (informativa, no es una tarea pendiente)
+
+`mcp-server/env.example` contiene actualmente los mismos valores que
+`.env`. Esto no representa un riesgo real — la contraseña de
+`agente_mcp` ya está documentada intencionalmente en `data.sql` como
+usuario de prueba para el profesor. Es solo una inconsistencia
+estética de convención (el `.example` idealmente llevaría placeholders
+genéricos en vez de valores reales copiados), sin impacto funcional
+ni de seguridad. No requiere acción.
 
 ## Estado del backend + pruebas (BLOQUE CERRADO — sin pendientes)
 
