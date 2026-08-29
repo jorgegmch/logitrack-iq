@@ -314,7 +314,7 @@ autorizado → acceso permitido → acceso denegado por rol incorrecto.
 ## 🐳 Docker
 
 `docker compose up --build` construye las imágenes del backend y del
-servidor MCP **desde el código fuente clonado** — al clonarse el repositorio, la
+servidor MCP **desde el código fuente clonado**, al clonarse el repositorio, la
 construcción ocurre localmente en cualquier máquina con Docker
 instalado.
 
