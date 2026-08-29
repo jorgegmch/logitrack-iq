@@ -118,9 +118,11 @@ completas y verificadas (compilación y/o ejecución confirmada).
       `03-diseno.md`
 - [x] Anotar endpoints nuevos con Swagger/OpenAPI
 - [x] Verificar en vivo Swagger UI (`/swagger-ui/index.html`) — **hecho**,
-      capturas confirmando que las 30+ rutas se renderizan correctamente
+      confirmado visualmente que las rutas se renderizan correctamente
       y sin errores, incluidas `/productos/riesgo` y `/bodegas/criticas`
-      ya corregidas
+      ya corregidas (evidencia visual: `03-authorize-admin.png` en
+      `docs/capturas/swagger-endpoints-protegidos/`, que muestra varios
+      grupos de rutas renderizados)
 - [x] Evidencia de endpoints **protegidos** en Swagger (login real + JWT
       + intento sin token + intento con rol incorrecto) — ver
       `docs/capturas/swagger-endpoints-protegidos/`: sin token (403),
