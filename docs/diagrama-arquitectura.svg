@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 760" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrowMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+
+  <!-- Fondo -->
+  <rect x="0" y="0" width="1280" height="760" fill="#0F172A"/>
+
+  <!-- Titulo -->
+  <text x="640" y="45" text-anchor="middle" fill="#F8FAFC" font-size="26" font-weight="800">LogiTrack IQ — Arquitectura del sistema</text>
+  <text x="640" y="70" text-anchor="middle" fill="#94A3B8" font-size="13">Flujo diario automatizado + torre de control manual</text>
+
+  <!-- ================= Contenedor Docker ================= -->
+  <rect x="40" y="110" width="820" height="560" rx="14" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="8,6"/>
+  <text x="60" y="135" fill="#64748B" font-size="13" font-weight="700" letter-spacing="1">DOCKER COMPOSE — RED INTERNA "logitrack-net"</text>
+
+  <!-- n8n -->
+  <rect x="80" y="165" width="230" height="130" rx="10" fill="#1E293B" stroke="#F59E0B" stroke-width="2"/>
+  <text x="195" y="195" text-anchor="middle" fill="#F8FAFC" font-size="16" font-weight="700">n8n</text>
+  <text x="195" y="215" text-anchor="middle" fill="#94A3B8" font-size="11">Schedule Trigger 6:00 a.m.</text>
+  <text x="195" y="232" text-anchor="middle" fill="#94A3B8" font-size="11">(America/Bogota)</text>
+  <text x="195" y="255" text-anchor="middle" fill="#F59E0B" font-size="11" font-weight="700">AI Agent</text>
+  <text x="195" y="272" text-anchor="middle" fill="#94A3B8" font-size="10">Google Gemini + skill</text>
+
+  <!-- mcp-server -->
+  <rect x="80" y="335" width="230" height="150" rx="10" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+  <text x="195" y="365" text-anchor="middle" fill="#F8FAFC" font-size="16" font-weight="700">mcp-server</text>
+  <text x="195" y="384" text-anchor="middle" fill="#94A3B8" font-size="11">Node.js — transporte SSE</text>
+  <text x="195" y="405" text-anchor="middle" fill="#38BDF8" font-size="11" font-weight="700">6 herramientas MCP</text>
+  <text x="195" y="423" text-anchor="middle" fill="#94A3B8" font-size="10">consultar_kpis · productos_en_riesgo</text>
+  <text x="195" y="438" text-anchor="middle" fill="#94A3B8" font-size="10">bodegas_criticas · stock_producto</text>
+  <text x="195" y="453" text-anchor="middle" fill="#94A3B8" font-size="10">crear_orden_borrador · publicar_resumen</text>
+  <text x="195" y="472" text-anchor="middle" fill="#EF4444" font-size="10" font-weight="700">usuario agente_mcp (rol AGENTE)</text>
+
+  <!-- backend -->
+  <rect x="380" y="250" width="440" height="380" rx="10" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+  <text x="600" y="282" text-anchor="middle" fill="#F8FAFC" font-size="17" font-weight="700">Backend — Spring Boot 4.1</text>
+  <text x="600" y="300" text-anchor="middle" fill="#94A3B8" font-size="11">com.jorgegmch.logitrack — puerto 8080</text>
+
+  <rect x="405" y="320" width="185" height="60" rx="6" fill="#0F172A" stroke="#334155"/>
+  <text x="497" y="345" text-anchor="middle" fill="#F8FAFC" font-size="12" font-weight="700">Security</text>
+  <text x="497" y="362" text-anchor="middle" fill="#94A3B8" font-size="10">JWT + roles ADMIN/AGENTE</text>
+
+  <rect x="610" y="320" width="185" height="60" rx="6" fill="#0F172A" stroke="#334155"/>
+  <text x="702" y="345" text-anchor="middle" fill="#F8FAFC" font-size="12" font-weight="700">Controllers</text>
+  <text x="702" y="362" text-anchor="middle" fill="#94A3B8" font-size="10">Ordenes · KPIs · Resumen</text>
+
+  <rect x="405" y="395" width="185" height="60" rx="6" fill="#0F172A" stroke="#334155"/>
+  <text x="497" y="420" text-anchor="middle" fill="#F8FAFC" font-size="12" font-weight="700">Services</text>
+  <text x="497" y="437" text-anchor="middle" fill="#94A3B8" font-size="10">Maquina de estados R17-R19</text>
+
+  <rect x="610" y="395" width="185" height="60" rx="6" fill="#0F172A" stroke="#334155"/>
+  <text x="702" y="420" text-anchor="middle" fill="#F8FAFC" font-size="12" font-weight="700">PdfService</text>
+  <text x="702" y="437" text-anchor="middle" fill="#94A3B8" font-size="10">OpenPDF + marca de agua</text>
+
+  <rect x="405" y="470" width="390" height="55" rx="6" fill="#0F172A" stroke="#334155"/>
+  <text x="600" y="495" text-anchor="middle" fill="#F8FAFC" font-size="12" font-weight="700">Repositories (Spring Data JPA)</text>
+  <text x="600" y="513" text-anchor="middle" fill="#94A3B8" font-size="10">Calculo de stock desde movimientos (R33)</text>
+
+  <rect x="405" y="545" width="390" height="65" rx="6" fill="#0F172A" stroke="#38BDF8" stroke-dasharray="4,3"/>
+  <text x="600" y="568" text-anchor="middle" fill="#F8FAFC" font-size="12" font-weight="700">static/ — Dashboard web</text>
+  <text x="600" y="586" text-anchor="middle" fill="#94A3B8" font-size="10">Login · KPIs · Riesgo · Ordenes · PDF</text>
+  <text x="600" y="601" text-anchor="middle" fill="#94A3B8" font-size="9">JWT en sessionStorage</text>
+
+  <!-- ================= Fuera de Docker ================= -->
+
+  <!-- Supabase -->
+  <rect x="920" y="330" width="300" height="130" rx="10" fill="#1E293B" stroke="#10B981" stroke-width="2"/>
+  <text x="1070" y="362" text-anchor="middle" fill="#F8FAFC" font-size="16" font-weight="700">Supabase (nube)</text>
+  <text x="1070" y="384" text-anchor="middle" fill="#10B981" font-size="12" font-weight="700">PostgreSQL</text>
+  <text x="1070" y="405" text-anchor="middle" fill="#94A3B8" font-size="10">Bodegas · Productos · Movimientos</text>
+  <text x="1070" y="421" text-anchor="middle" fill="#94A3B8" font-size="10">Ordenes · Resumenes · Auditoria</text>
+  <text x="1070" y="440" text-anchor="middle" fill="#94A3B8" font-size="9">Transaction pooler, puerto 6543</text>
+
+  <!-- Navegador / Admin -->
+  <rect x="920" y="500" width="300" height="130" rx="10" fill="#1E293B" stroke="#F8FAFC" stroke-width="2"/>
+  <text x="1070" y="532" text-anchor="middle" fill="#F8FAFC" font-size="16" font-weight="700">Navegador — ADMIN</text>
+  <text x="1070" y="555" text-anchor="middle" fill="#94A3B8" font-size="11">localhost:8080/html/dashboard.html</text>
+  <text x="1070" y="578" text-anchor="middle" fill="#94A3B8" font-size="10">Aprobar · Recibir · Cancelar</text>
+  <text x="1070" y="595" text-anchor="middle" fill="#94A3B8" font-size="10">Ver / generar PDF de ordenes</text>
+  <text x="1070" y="615" text-anchor="middle" fill="#94A3B8" font-size="9">Swagger UI: /swagger-ui/index.html</text>
+
+  <!-- ================= Flechas ================= -->
+
+  <!-- n8n -> mcp-server -->
+  <path d="M195,295 L195,335" stroke="#38BDF8" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="255" y="318" fill="#38BDF8" font-size="9">SSE :3001</text>
+
+  <!-- mcp-server -> backend -->
+  <path d="M310,410 L395,410" stroke="#38BDF8" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="320" y="400" fill="#38BDF8" font-size="9">HTTP + JWT :8080</text>
+
+  <!-- backend -> supabase -->
+  <path d="M820,400 L915,400" stroke="#10B981" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="825" y="390" fill="#10B981" font-size="9">JDBC (SSL)</text>
+
+  <!-- navegador <-> backend -->
+  <path d="M915,570 L825,570" stroke="#F8FAFC" stroke-width="2.5" fill="none" marker-end="url(#arrowMuted)"/>
+  <path d="M825,590 L915,590" stroke="#F8FAFC" stroke-width="2.5" fill="none" marker-end="url(#arrowMuted)"/>
+  <text x="828" y="605" fill="#94A3B8" font-size="9">REST + JWT (misma app)</text>
+
+  <!-- Leyenda -->
+  <g transform="translate(60, 700)">
+    <circle cx="0" cy="0" r="5" fill="#F59E0B"/>
+    <text x="12" y="4" fill="#94A3B8" font-size="11">Automatizado (n8n, 6:00 a.m.)</text>
+    <circle cx="260" cy="0" r="5" fill="#38BDF8"/>
+    <text x="272" y="4" fill="#94A3B8" font-size="11">Servicios dockerizados</text>
+    <circle cx="470" cy="0" r="5" fill="#10B981"/>
+    <text x="482" y="4" fill="#94A3B8" font-size="11">Base de datos (nube)</text>
+    <circle cx="670" cy="0" r="5" fill="#F8FAFC"/>
+    <text x="682" y="4" fill="#94A3B8" font-size="11">Interaccion humana (ADMIN)</text>
+  </g>
+</svg>
