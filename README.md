@@ -328,10 +328,6 @@ depender de `host.docker.internal`.
 
 [▶️ Video demostrativo — LogiTrack IQ](docs/logitrack-iq-demo.mp4)
 
-*(Enlace activo una vez se agregue el archivo `docs/video-sustentacion.mp4`
-al repositorio — guardarlo con ese nombre exacto para que este enlace
-funcione automáticamente.)*
-
 ---
 
 ## 🧑‍💻 Autor
