@@ -21,7 +21,7 @@ IA/MCP, dashboard de gestión y flujo diario automatizado con n8n.
 - [Servidor MCP — evidencia de herramientas](#-servidor-mcp--evidencia-de-herramientas)
 - [Evidencia de endpoints protegidos](#-evidencia-de-endpoints-protegidos-swagger)
 - [Docker](#-docker)
-- [Video de sustentación](#-video-de-sustentación)
+- [Video demo Logitrack IQ](#-video-demo-logitrack-iq)
 
 ---
 
@@ -324,7 +324,7 @@ depender de `host.docker.internal`.
 
 ---
 
-## 🎥 Video de sustentación
+## 🎥 Video demo Logitrack IQ
 
 [▶️ Video demostrativo — LogiTrack IQ](docs/logitrack-iq-demo.mp4)
 
